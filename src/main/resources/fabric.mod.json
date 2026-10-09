@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "cosmos-carpet-addons",
+	"version": "${version}",
+	"name": "Cosmos Carpet Addons",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/cosmos-carpet-addons/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.cosmosmc.carpetaddons.CosmosCarpetAddons"
+		],
+		"client": [
+			"net.cosmosmc.carpetaddons.client.CosmosCarpetAddonsClient"
+		]
+	},
+	"mixins": [
+		"cosmos-carpet-addons.mixins.json",
+		{
+			"config": "cosmos-carpet-addons.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
