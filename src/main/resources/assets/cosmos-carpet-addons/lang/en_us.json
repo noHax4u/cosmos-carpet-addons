@@ -1,0 +1,6 @@
+{
+  "carpet.rule.ghostProjectileFix.desc": "Fixes a projectile motion desync",
+  "carpet.rule.ghostProjectileFix.extra.0": "overrides ghostEntitiesFix (the general fix for all entities) for projectiles",
+
+  "carpet.rule.ghostEntitiesFix.desc": "Fixes an entity motion desync"
+}
