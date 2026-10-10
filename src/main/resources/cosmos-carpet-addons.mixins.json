@@ -3,7 +3,9 @@
 	"package": "net.cosmosmc.carpetaddons.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"mixins": [
-		"ExampleMixin"
+		"ExampleMixin",
+		"MinecartTNTDebugger",
+		"VehicleEntityDebugger"
 	],
 	"injectors": {
 		"defaultRequire": 1
