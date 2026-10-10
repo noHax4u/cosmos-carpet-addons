@@ -4,7 +4,7 @@
 none yet
 
 ## Loggers
-TNTCart [ __chat__ / sound / full ]
+TNTCart [ **chat** / sound / full ]
 
 chat: only logs TNT minecart telemetry to chat
 
