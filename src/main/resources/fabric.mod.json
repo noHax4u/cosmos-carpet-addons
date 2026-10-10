@@ -3,12 +3,13 @@
 	"id": "cosmos-carpet-addons",
 	"version": "${version}",
 	"name": "Cosmos Carpet Addons",
-	"description": "Potentially carpet addons",
+	"description": "Potentially useful carpet addons",
 	"authors": [
 		"noHax4u"
 	],
 	"contact": {
-		"sources": "https://github.com/noHax4u/cosmos-carpet-addons"
+		"sources": "https://github.com/noHax4u/cosmos-carpet-addons",
+		"issues" : "https://github.com/noHax4u/cosmos-carpet-addons/issues"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/cosmos-carpet-addons/icon.png",
@@ -32,6 +33,14 @@
 		"fabricloader": ">=0.19.5",
 		"minecraft": "~26.2",
 		"java": ">=25",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"carpet": "*"
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"Discord": "https://discord.gg/KmDsW6tKbs"
+			}
+		}
 	}
 }
