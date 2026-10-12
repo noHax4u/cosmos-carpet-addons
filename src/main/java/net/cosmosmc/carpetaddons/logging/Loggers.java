@@ -4,6 +4,7 @@ import carpet.logging.Logger;
 import carpet.logging.LoggerRegistry;
 import net.cosmosmc.carpetaddons.CosmosCarpetAddons;
 import net.cosmosmc.carpetaddons.logging.TNTCart.TNTCartLogger;
+import net.cosmosmc.carpetaddons.logging.TNTCart.TNTCartPrimeLogger;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
@@ -24,6 +25,7 @@ import java.util.function.Function;
 public class Loggers {
     public static void register() {
         register(TNTCartLogger.getInstance());
+        register(TNTCartPrimeLogger.getInstance());
     }
 
     private static void register(Logger logger) {
@@ -48,6 +50,13 @@ public class Loggers {
         private String msg;
         private Function<String, Boolean> predicate;
 
+        public static boolean alwaysSend(String ignored) {
+            return true;
+        }
+
+        public FormattedMessage(String format, Object ...args) {
+            this(FormattedMessage::alwaysSend, format, args);
+        }
         public FormattedMessage(Function<String, Boolean> predicate, String format, Object... args) {
             msg = FormattedMessage.format(format, args);
             this.predicate = predicate;

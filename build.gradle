@@ -20,6 +20,8 @@ loom {
 			sourceSet sourceSets.client
 		}
 	}
+
+	accessWidenerPath = file("src/main/resources/cosmos-carpet-addons.classtweaker")
 }
 
 dependencies {
