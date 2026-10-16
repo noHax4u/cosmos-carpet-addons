@@ -34,6 +34,12 @@ public class CosmosCarpetAddonsServer implements CarpetExtension {
     @Override
     public void onGameStarted() {
         CarpetServer.settingsManager.parseSettingsClass(CosmosCarpetAddonsSettings.class);
+        CarpetServer.settingsManager.registerRuleObserver((source, rule, value) -> {
+            if (source != null && rule.name().equals("fullrangecfinditem")) {
+                var playerList = source.getServer().getPlayerList();
+                playerList.getPlayers().forEach(playerList::sendPlayerPermissionLevel);
+            }
+        });
     }
 
     // https://github.com/gnembon/fabric-carpet/wiki/Migrating-to-the-new-settings-system#register-your-language-file
