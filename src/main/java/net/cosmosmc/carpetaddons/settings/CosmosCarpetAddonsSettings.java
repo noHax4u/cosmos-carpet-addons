@@ -11,6 +11,9 @@ import static carpet.api.settings.RuleCategory.*;
 import static net.cosmosmc.carpetaddons.settings.RuleCategory.*;
 
 public class CosmosCarpetAddonsSettings {
+    @Rule(categories = {SURVIVAL, CCA})
+    public static boolean fullrangecfinditem = false;
+
     private static class SyncTimeValidator extends Validator<Integer> {
         @Override
         public Integer validate(@Nullable CommandSourceStack source, CarpetRule<Integer> changingRule, Integer newValue, String userInput) {
