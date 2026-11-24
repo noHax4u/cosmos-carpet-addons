@@ -1,5 +1,6 @@
 package net.cosmosmc.carpetaddons.client.litematica;
 
+import net.cosmosmc.carpetaddons.lightmanipulator.schematic.SchematicRegionLight;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
@@ -21,7 +22,7 @@ import java.util.Map;
 
 /**
  * Light level part of a Litematica schematic verifier: compares the light levels stored in the schematic
- * ({@link RegionLight}) with the client's world.
+ * ({@link SchematicRegionLight}) with the client's world.
  */
 public final class LightVerifier {
     public record LightMismatch(BlockPos pos, int expectedBlock, int expectedSky, int foundBlock, int foundSky) {
@@ -75,36 +76,6 @@ public final class LightVerifier {
     }
 
     /**
-     * Maps world positions back to positions inside one sub-region of a placed schematic, reversing
-     * Litematica's {@code SchematicPlacingUtils.placeBlocksWithinChunk}.
-     */
-    private record RegionMapping(RegionLight light, SchematicPlacement schematicPlacement, SubRegionPlacement placement,
-                                 BlockPos regionOrigin, BlockPos containerOffset) {
-        static @Nullable RegionMapping of(SchematicPlacement schematicPlacement, String regionName) {
-            LitematicaSchematic schematic = schematicPlacement.getSchematic();
-            RegionLight light = schematic == null ? null : ((LightSchematic) schematic).cca$getRegionLight(regionName);
-            SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
-            Vec3i regionSize = schematic == null ? null : schematic.getAreaSizeAsVec3i(regionName);
-            if (light == null || placement == null || !placement.isEnabled() || regionSize == null) {
-                return null;
-            }
-            BlockPos regionPos = placement.getPos();
-            BlockPos posEndRel = new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(regionSize)).offset(regionPos);
-            BlockPos posMinRel = PositionUtils.getMinCorner(regionPos, posEndRel);
-            BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-            return new RegionMapping(light, schematicPlacement, placement, regionPosTransformed.offset(schematicPlacement.getOrigin()), posMinRel.subtract(regionPos));
-        }
-
-        /** @return the position inside the region's light data */
-        BlockPos toRegion(BlockPos worldPos) {
-            BlockPos rel = worldPos.subtract(regionOrigin);
-            rel = PositionUtils.getReverseTransformedBlockPos(rel, placement.getMirror(), placement.getRotation());
-            rel = PositionUtils.getReverseTransformedBlockPos(rel, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-            return rel.subtract(containerOffset);
-        }
-    }
-
-    /**
      * Called for every box Litematica verifies (one sub-region within one chunk).
      */
     public void verifyBox(ClientLevel world, SchematicPlacement schematicPlacement, ChunkPos chunkPos, IntBoundingBox box) {
@@ -115,7 +86,7 @@ public final class LightVerifier {
                 break;
             }
         }
-        RegionMapping mapping = regionName == null ? null : RegionMapping.of(schematicPlacement, regionName);
+        LitematicaRegionMapping mapping = regionName == null ? null : LitematicaRegionMapping.of(schematicPlacement, regionName);
         if (mapping == null) {
             return;
         }
@@ -155,11 +126,11 @@ public final class LightVerifier {
      * may have been moved since they were found. Positions it no longer covers are dropped.
      */
     private void recheck(ClientLevel world, SchematicPlacement schematicPlacement) {
-        List<RegionMapping> mappings = new ArrayList<>();
+        List<LitematicaRegionMapping> mappings = new ArrayList<>();
         LitematicaSchematic schematic = schematicPlacement.getSchematic();
         if (schematic != null) {
             for (String regionName : schematic.getAreaSizes().keySet()) {
-                RegionMapping mapping = RegionMapping.of(schematicPlacement, regionName);
+                LitematicaRegionMapping mapping = LitematicaRegionMapping.of(schematicPlacement, regionName);
                 if (mapping != null) {
                     mappings.add(mapping);
                 }
@@ -169,9 +140,9 @@ public final class LightVerifier {
 
         for (LightMismatch mismatch : new ArrayList<>(mismatches.values())) {
             BlockPos pos = mismatch.pos();
-            RegionMapping covering = null;
+            LitematicaRegionMapping covering = null;
             BlockPos rel = null;
-            for (RegionMapping mapping : mappings) {
+            for (LitematicaRegionMapping mapping : mappings) {
                 rel = mapping.toRegion(pos);
                 if (mapping.light().contains(rel.getX(), rel.getY(), rel.getZ())) {
                     covering = mapping;

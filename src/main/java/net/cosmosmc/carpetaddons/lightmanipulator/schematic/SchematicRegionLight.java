@@ -1,28 +1,30 @@
-package net.cosmosmc.carpetaddons.client.litematica;
+package net.cosmosmc.carpetaddons.lightmanipulator.schematic;
 
-import fi.dy.masa.malilib.util.data.tag.CompoundData;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Block and sky light levels of one schematic sub-region, indexed like Litematica's block state container
  * (x, y, z relative to the region's minimum corner).
  * <p>
- * Stored in the region's compound as {@value #TAG}. Litematica only reads the keys it knows,
- * so unmodified Litematica clients load these schematics normally and just ignore the light data.
+ * Stored in the region's compound of a {@code .litematic} file as {@value #TAG}, a compound with
+ * {@code Version} (int), {@code Block} and optionally {@code Sky} (nibble byte arrays). Litematica only reads
+ * the keys it knows, so unmodified Litematica clients load these schematics normally and ignore the light data.
+ * <p>
+ * Used by the client (Litematica) and the server (Servux), which each read and write it with their own NBT classes.
  */
-public final class RegionLight {
+public final class SchematicRegionLight {
     public static final String TAG = "cca:Light";
-    private static final int FORMAT_VERSION = 1;
+    public static final int FORMAT_VERSION = 1;
 
     private final int sizeX, sizeY, sizeZ;
     private final byte[] block;
     private final byte @Nullable [] sky;
 
-    public RegionLight(int sizeX, int sizeY, int sizeZ, boolean hasSky) {
+    public SchematicRegionLight(int sizeX, int sizeY, int sizeZ, boolean hasSky) {
         this(sizeX, sizeY, sizeZ, new byte[nibbleArraySize(sizeX, sizeY, sizeZ)], hasSky ? new byte[nibbleArraySize(sizeX, sizeY, sizeZ)] : null);
     }
 
-    private RegionLight(int sizeX, int sizeY, int sizeZ, byte[] block, byte @Nullable [] sky) {
+    private SchematicRegionLight(int sizeX, int sizeY, int sizeZ, byte[] block, byte @Nullable [] sky) {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
@@ -30,8 +32,27 @@ public final class RegionLight {
         this.sky = sky;
     }
 
+    /**
+     * @return the light data from stored arrays, or null if they don't match the region's size
+     */
+    public static @Nullable SchematicRegionLight fromArrays(int sizeX, int sizeY, int sizeZ, byte @Nullable [] block, byte @Nullable [] sky) {
+        int expected = nibbleArraySize(sizeX, sizeY, sizeZ);
+        if (block == null || block.length != expected || (sky != null && sky.length != expected)) {
+            return null;
+        }
+        return new SchematicRegionLight(sizeX, sizeY, sizeZ, block, sky);
+    }
+
     private static int nibbleArraySize(int sizeX, int sizeY, int sizeZ) {
         return (int) (((long) sizeX * sizeY * sizeZ + 1) / 2);
+    }
+
+    public byte[] blockData() {
+        return block;
+    }
+
+    public byte @Nullable [] skyData() {
+        return sky;
     }
 
     public boolean contains(int x, int y, int z) {
@@ -70,32 +91,5 @@ public final class RegionLight {
         if (sky != null) {
             set(sky, index, skyLight);
         }
-    }
-
-    public CompoundData write() {
-        CompoundData tag = new CompoundData();
-        tag.putInt("Version", FORMAT_VERSION);
-        tag.putByteArray("Block", block);
-        if (sky != null) {
-            tag.putByteArray("Sky", sky);
-        }
-        return tag;
-    }
-
-    /**
-     * @return the light data of a region compound, or null if it has none or it doesn't match the region's size
-     */
-    public static @Nullable RegionLight read(CompoundData regionTag, int sizeX, int sizeY, int sizeZ) {
-        if (!regionTag.contains(TAG, 10)) {
-            return null;
-        }
-        CompoundData tag = regionTag.getCompound(TAG);
-        int expected = nibbleArraySize(sizeX, sizeY, sizeZ);
-        byte[] block = tag.getByteArray("Block");
-        byte[] sky = tag.contains("Sky", 7) ? tag.getByteArray("Sky") : null;
-        if (block == null || block.length != expected || (sky != null && sky.length != expected)) {
-            return null;
-        }
-        return new RegionLight(sizeX, sizeY, sizeZ, block, sky);
     }
 }

@@ -1,0 +1,15 @@
+{
+	"required": false,
+	"package": "net.cosmosmc.carpetaddons.mixin.servux",
+	"plugin": "net.cosmosmc.carpetaddons.mixin.OptionalModMixinPlugin",
+	"compatibilityLevel": "JAVA_25",
+	"priority": 1100,
+	"mixins": [
+		"ServuxLitematicaSchematicMixin",
+		"ServuxSchematicPlacementMixin",
+		"ServuxSchematicPlacingUtilsMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

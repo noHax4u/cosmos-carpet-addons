@@ -134,11 +134,22 @@ lists the closest mismatches when hovered, and toggles highlighting them in the 
 mismatches the placement no longer covers (e.g. after moving it) disappear within a second; new ones are found by
 running the verifier again.
 
+Pasting schematics also pastes their light levels while the `lightLevelManipulator` rule is enabled (otherwise
+the pasted blocks would be relit right away). Light is only written where the schematic's block was actually pasted
+(respecting the paste layer settings and replace behaviour). This works for:
+
+- singleplayer pastes (Litematica places the blocks directly), and
+- pastes through [Servux](https://modrinth.com/mod/servux) on servers that have this mod installed (Servux is an
+  optional dependency on the server). Clients tell Servux whether to paste light; clients without this mod never do.
+
+Pastes using commands (multiplayer without Servux) don't paste light.
+
 Options are added to Litematica's config screen (stored in `config/cosmos-carpet-addons-litematica.json`):
 
 | Tab | Option | Default |
 |---|---|---|
 | Generic | Save: Include Light Levels (default of the save screen checkbox) | off |
+| Generic | Paste: Include Light Levels | on |
 | Generic | Verifier: Check Light Levels | on |
 | Generic | Verifier: Check Sky Light | on |
 | Info Overlays | Verifier Light Overlay | off |
@@ -170,7 +181,7 @@ logs TNT minecart info useful for designing TNT minecart duping looters
 The jar ends up in `build/libs`. Axiom and Litematica are only needed at compile time (they are downloaded
 from Modrinth's Maven automatically) and are not bundled.
 
-To test with Axiom and Litematica in the dev environment, install them into `run/mods`, then run the client
+To test with Axiom, Litematica and Servux in the dev environment, install them into `run/mods`, then run the client
 or server as usual:
 
 ```

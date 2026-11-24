@@ -26,6 +26,7 @@ public final class LitematicaLightConfigs {
 
     // Generic
     public static final ConfigBoolean SAVE_INCLUDE_LIGHT = (ConfigBoolean) new ConfigBoolean("schematicSaveIncludeLight", false).apply(PREFIX);
+    public static final ConfigBoolean PASTE_INCLUDE_LIGHT = (ConfigBoolean) new ConfigBoolean("schematicPasteIncludeLight", true).apply(PREFIX);
     public static final ConfigBoolean VERIFY_LIGHT = (ConfigBoolean) new ConfigBoolean("verifierCheckLightLevels", true).apply(PREFIX);
     public static final ConfigBoolean VERIFY_SKY_LIGHT = (ConfigBoolean) new ConfigBoolean("verifierCheckSkyLight", true).apply(PREFIX);
 
@@ -37,7 +38,7 @@ public final class LitematicaLightConfigs {
     // Colors
     public static final ConfigColor LIGHT_OVERLAY_COLOR = new ConfigColor("schematicOverlayColorWrongLight", "#FF9966FF").apply(PREFIX);
 
-    public static final List<IConfigBase> GENERIC = ImmutableList.of(SAVE_INCLUDE_LIGHT, VERIFY_LIGHT, VERIFY_SKY_LIGHT);
+    public static final List<IConfigBase> GENERIC = ImmutableList.of(SAVE_INCLUDE_LIGHT, PASTE_INCLUDE_LIGHT, VERIFY_LIGHT, VERIFY_SKY_LIGHT);
     public static final List<IConfigBase> INFO_OVERLAYS = ImmutableList.of(LIGHT_OVERLAY_ENABLED, LIGHT_OVERLAY_OVER_OTHER_MARKERS, LIGHT_OVERLAY_MAX_POSITIONS);
     public static final List<IConfigBase> COLORS = ImmutableList.of(LIGHT_OVERLAY_COLOR);
 

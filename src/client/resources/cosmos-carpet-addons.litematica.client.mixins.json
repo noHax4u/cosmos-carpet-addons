@@ -12,6 +12,8 @@
 		"GuiSchematicVerifierMixin",
 		"LitematicaSchematicMixin",
 		"OverlayRendererMixin",
+		"SchematicPlacementMixin",
+		"SchematicPlacingUtilsMixin",
 		"SchematicVerifierMixin"
 	],
 	"injectors": {

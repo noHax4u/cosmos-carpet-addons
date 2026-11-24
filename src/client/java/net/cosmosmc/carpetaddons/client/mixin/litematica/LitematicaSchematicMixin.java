@@ -8,7 +8,8 @@ import fi.dy.masa.malilib.util.data.tag.CompoundData;
 import fi.dy.masa.malilib.util.data.tag.util.DataTypeUtils;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import net.cosmosmc.carpetaddons.client.litematica.LightSchematic;
-import net.cosmosmc.carpetaddons.client.litematica.RegionLight;
+import net.cosmosmc.carpetaddons.lightmanipulator.schematic.SchematicRegionLight;
+import net.cosmosmc.carpetaddons.client.litematica.LightNbt;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
@@ -24,22 +25,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Captures, saves and loads per-region light levels ({@link RegionLight}) for Litematica schematics.
+ * Captures, saves and loads per-region light levels ({@link SchematicRegionLight}) for Litematica schematics.
  */
 @Mixin(value = LitematicaSchematic.class, remap = false)
 public abstract class LitematicaSchematicMixin implements LightSchematic {
     @Unique
-    private final Map<String, RegionLight> cca$light = new HashMap<>();
+    private final Map<String, SchematicRegionLight> cca$light = new HashMap<>();
     @Unique
     private boolean cca$captureLight;
 
     @Override
-    public @Nullable RegionLight cca$getRegionLight(String regionName) {
+    public @Nullable SchematicRegionLight cca$getRegionLight(String regionName) {
         return cca$light.get(regionName);
     }
 
     @Override
-    public void cca$putRegionLight(String regionName, RegionLight light) {
+    public void cca$putRegionLight(String regionName, SchematicRegionLight light) {
         cca$light.put(regionName, light);
     }
 
@@ -70,8 +71,8 @@ public abstract class LitematicaSchematicMixin implements LightSchematic {
             }
             BlockPos min = PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
             BlockPos size = box.getSize();
-            RegionLight light = cca$light.computeIfAbsent(regionName,
-                    name -> new RegionLight(Math.abs(size.getX()), Math.abs(size.getY()), Math.abs(size.getZ()), hasSky));
+            SchematicRegionLight light = cca$light.computeIfAbsent(regionName,
+                    name -> new SchematicRegionLight(Math.abs(size.getX()), Math.abs(size.getY()), Math.abs(size.getZ()), hasSky));
 
             for (int y = bb.minY(); y <= bb.maxY(); y++) {
                 for (int z = bb.minZ(); z <= bb.maxZ(); z++) {
@@ -93,7 +94,7 @@ public abstract class LitematicaSchematicMixin implements LightSchematic {
         cca$light.forEach((regionName, light) -> {
             if (regions.contains(regionName, 10)) {
                 // getCompound returns the stored compound, so this adds the light data to the written region
-                regions.getCompound(regionName).put(RegionLight.TAG, light.write());
+                regions.getCompound(regionName).put(SchematicRegionLight.TAG, LightNbt.write(light));
             }
         });
     }
@@ -110,7 +111,7 @@ public abstract class LitematicaSchematicMixin implements LightSchematic {
             if (size == null) {
                 continue;
             }
-            RegionLight light = RegionLight.read(regionTag, Math.abs(size.getX()), Math.abs(size.getY()), Math.abs(size.getZ()));
+            SchematicRegionLight light = LightNbt.read(regionTag, Math.abs(size.getX()), Math.abs(size.getY()), Math.abs(size.getZ()));
             if (light != null) {
                 cca$light.put(regionName, light);
             }
