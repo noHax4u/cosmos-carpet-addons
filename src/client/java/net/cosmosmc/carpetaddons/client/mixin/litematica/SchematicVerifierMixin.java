@@ -7,7 +7,6 @@ import net.cosmosmc.carpetaddons.client.litematica.LightVerifier;
 import net.cosmosmc.carpetaddons.client.litematica.LightVerifierHolder;
 import net.cosmosmc.carpetaddons.client.litematica.LightMarkers;
 import net.cosmosmc.carpetaddons.client.litematica.LitematicaLightConfigs;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -60,9 +59,7 @@ public abstract class SchematicVerifierMixin implements LightVerifierHolder {
 
     @Inject(method = "execute", at = @At("TAIL"))
     private void cca$tickLight(ProfilerFiller profiler, CallbackInfoReturnable<Boolean> cir) {
-        var player = Minecraft.getInstance().player;
-        cca$lightVerifier.tick(worldClient, schematicPlacement, isFinished(), player == null ? null : player.blockPosition(),
-                LitematicaLightConfigs.LIGHT_OVERLAY_MAX_POSITIONS.getIntegerValue());
+        cca$lightVerifier.tick(worldClient, schematicPlacement, isFinished());
     }
 
     /**

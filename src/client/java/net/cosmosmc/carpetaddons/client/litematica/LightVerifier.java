@@ -32,17 +32,23 @@ public final class LightVerifier {
         }
     }
 
-    private static final int RECHECK_INTERVAL_TICKS = 20;
+    /** How often known mismatches are re-checked, in real time (Litematica runs the verifier only every few ticks). */
+    private static final long RECHECK_INTERVAL_MS = 1000;
+    /** The highlighted positions are re-sorted when the player moved this far (squared distance). */
+    private static final double RESORT_DISTANCE_SQ = 4 * 4;
 
     private final Long2ObjectMap<LightMismatch> mismatches = new Long2ObjectOpenHashMap<>();
     private List<BlockPos> closest = List.of();
+    private boolean closestDirty = false;
+    private @Nullable BlockPos closestCenter = null;
     private int checkedPositions = 0;
     private boolean schematicHasLight = false;
-    private int ticks = 0;
+    private long lastRecheck = 0;
 
     public void clear() {
         mismatches.clear();
         closest = List.of();
+        closestDirty = false;
         checkedPositions = 0;
         schematicHasLight = false;
     }
@@ -59,7 +65,22 @@ public final class LightVerifier {
         return checkedPositions;
     }
 
+    /**
+     * @return the mismatches to highlight, closest to the player first. Updated right away when mismatches are found or
+     * fixed (and when the player moved a bit), so markers show up as soon as the verifier found them.
+     */
     public List<BlockPos> closestMismatches() {
+        var player = net.minecraft.client.Minecraft.getInstance().player;
+        BlockPos center = player == null ? BlockPos.ZERO : player.blockPosition();
+        if (closestDirty || closestCenter == null || closestCenter.distSqr(center) > RESORT_DISTANCE_SQ) {
+            closest = mismatches.values().stream()
+                    .map(LightMismatch::pos)
+                    .sorted(Comparator.comparingDouble(pos -> pos.distSqr(center)))
+                    .limit(LitematicaLightConfigs.LIGHT_OVERLAY_MAX_POSITIONS.getIntegerValue())
+                    .toList();
+            closestCenter = center;
+            closestDirty = false;
+        }
         return closest;
     }
 
@@ -111,9 +132,12 @@ public final class LightVerifier {
         int foundBlock = world.getBrightness(LightLayer.BLOCK, pos);
         int foundSky = expectedSky >= 0 ? world.getBrightness(LightLayer.SKY, pos) : -1;
         if (foundBlock != expectedBlock || foundSky != expectedSky) {
-            mismatches.put(pos.asLong(), new LightMismatch(pos, expectedBlock, expectedSky, foundBlock, foundSky));
-        } else {
-            mismatches.remove(pos.asLong());
+            LightMismatch mismatch = new LightMismatch(pos, expectedBlock, expectedSky, foundBlock, foundSky);
+            if (!mismatch.equals(mismatches.put(pos.asLong(), mismatch))) {
+                closestDirty = true;
+            }
+        } else if (mismatches.remove(pos.asLong()) != null) {
+            closestDirty = true;
         }
     }
 
@@ -147,6 +171,7 @@ public final class LightVerifier {
             }
             if (covering == null) {
                 mismatches.remove(pos.asLong());
+                closestDirty = true;
             } else if (world.hasChunkAt(pos)) {
                 int expectedSky = checkSky && covering.light().hasSky() ? covering.light().getSky(rel.getX(), rel.getY(), rel.getZ()) : -1;
                 check(world, pos, covering.light().getBlock(rel.getX(), rel.getY(), rel.getZ()), expectedSky);
@@ -155,24 +180,22 @@ public final class LightVerifier {
     }
 
     /**
-     * Called every client tick while the verifier exists: once it has finished, re-checks the known
-     * mismatches (so fixed ones disappear) and updates the closest positions to highlight.
+     * Called whenever Litematica runs the verifier task: once it has finished, re-checks the known mismatches
+     * about once a second, so fixed ones (and ones the moved placement no longer covers) disappear.
      */
-    public void tick(ClientLevel world, @Nullable SchematicPlacement schematicPlacement, boolean finished, @Nullable BlockPos center, int maxHighlighted) {
-        if (++ticks % RECHECK_INTERVAL_TICKS != 0 || world == null) {
+    public void tick(@Nullable ClientLevel world, @Nullable SchematicPlacement schematicPlacement, boolean finished) {
+        long now = System.currentTimeMillis();
+        if (world == null || now - lastRecheck < RECHECK_INTERVAL_MS) {
             return;
         }
+        lastRecheck = now;
         if (schematicPlacement == null) {
-            mismatches.clear();
+            if (!mismatches.isEmpty()) {
+                mismatches.clear();
+                closestDirty = true;
+            }
         } else if (finished && !mismatches.isEmpty()) {
             recheck(world, schematicPlacement);
-        }
-        if (center != null) {
-            closest = mismatches.values().stream()
-                    .map(LightMismatch::pos)
-                    .sorted(Comparator.comparingDouble(pos -> pos.distSqr(center)))
-                    .limit(maxHighlighted)
-                    .toList();
         }
     }
 }
