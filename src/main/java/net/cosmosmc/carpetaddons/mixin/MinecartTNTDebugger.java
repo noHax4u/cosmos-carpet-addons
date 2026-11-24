@@ -1,11 +1,16 @@
 package net.cosmosmc.carpetaddons.mixin;
 
+import net.cosmosmc.carpetaddons.CosmosCarpetAddons;
 import net.cosmosmc.carpetaddons.logging.TNTCart.TNTCartLogger;
+import net.cosmosmc.carpetaddons.logging.TNTCart.TNTCartPrimeLogger;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.vehicle.minecart.MinecartTNT;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
@@ -18,12 +23,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import static java.lang.Math.sqrt;
 
 @Mixin(MinecartTNT.class)
-abstract class MinecartTNTDebugger {
+public abstract class MinecartTNTDebugger {
     private int tick_count = 0;
     private boolean didExplode = false;
     private boolean didDrop    = false;
 
-    private String id() {
+    public String _id() {
         return String.format("@%04X", this.hashCode() & 0xffff);
     }
     private MinecartTNT self() {
@@ -35,8 +40,8 @@ abstract class MinecartTNTDebugger {
         at = @At("TAIL")
     )
     private void init(EntityType type, Level level, CallbackInfo ci) {
-        TNTCartLogger.log("§3{}§r <init>", id());
-        self().setCustomName(Component.literal(id()));
+        TNTCartLogger.log("§3{}§r <init>", _id());
+        self().setCustomName(Component.literal(_id()));
         self().setCustomNameVisible(true);
     }
 
@@ -48,7 +53,7 @@ abstract class MinecartTNTDebugger {
         )
     )
     void beforeFuseExplosion(CallbackInfo ci) {
-        TNTCartLogger.log("§3{}§r explosion!", id());
+        TNTCartLogger.log("§3{}§r explosion!", _id());
         didExplode = true;
     }
 
@@ -60,21 +65,23 @@ abstract class MinecartTNTDebugger {
         )
     )
     void beforeExplodeFromFalldamage(double d, float f, DamageSource damageSource, CallbackInfoReturnable<Boolean> cir) {
-        TNTCartLogger.log("*§3{}§r fell from a high place*", id());
+        TNTCartLogger.log("*§3{}§r fell from a high place*", _id());
     }
 
     @Inject(method="tick", at = @At("HEAD"))
     void onTick(CallbackInfo ci) {
-        TNTCartLogger.log("§3{}§r begin tick #{}", id(), ++tick_count);
+        TNTCartLogger.log("§3{}§r begin tick #{}", _id(), ++tick_count);
     }
 
     @Inject(method="getDropItem", at = @At("HEAD"))
     void dropAsItem(CallbackInfoReturnable<Item> cir) {
-        TNTCartLogger.log("§3{}§r dropping", id());
+        TNTCartLogger.log("§3{}§r dropping", _id());
         didDrop = true;
+
+        // no more renamed items
+        self().setCustomName(null);
     }
 
-    // this.getDeltaMovement().horizontalDistanceSqr()
     @Inject(method="destroy", at = @At("HEAD"))
     void startDestroy(ServerLevel serverLevel, DamageSource damageSource, CallbackInfo ci) {
         double d = self().getDeltaMovement().horizontalDistanceSqr();
@@ -88,12 +95,20 @@ abstract class MinecartTNTDebugger {
             return;
 
         if (didExplode && didDrop) {
-            TNTCartLogger.log("§a{} SUCCESS", id());
+            TNTCartLogger.log("§a{} SUCCESS", _id());
             TNTCartLogger.playSound(self(), SoundEvents.NOTE_BLOCK_BELL.value());
         }
         else {
-            TNTCartLogger.log("§c{} FAILED", id());
+            TNTCartLogger.log("§c{} FAILED", _id());
             TNTCartLogger.playSound(self(), SoundEvents.NOTE_BLOCK_TRUMPET_OXIDIZED.value());
+        }
+    }
+
+    @Inject(method="hurtServer", at = @At("HEAD"))
+    void onHurtServer(ServerLevel level, DamageSource source, float damage, CallbackInfoReturnable<Boolean> cir) {
+        Entity entity = source.getDirectEntity();
+        if (entity != null && MinecartTNT.damageSourceIgnitesTnt(source)) {
+            TNTCartPrimeLogger.log(_id(), entity);
         }
     }
 }

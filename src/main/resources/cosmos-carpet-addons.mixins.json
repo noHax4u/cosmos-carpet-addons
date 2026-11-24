@@ -5,6 +5,8 @@
 	"mixins": [
 		"EntityMixin",
 		"MinecartTNTDebugger",
+		"PlayerListMixin",
+		"ServerGamePacketListenerImplMixin",
 		"VehicleEntityDebugger"
 	],
 	"injectors": {

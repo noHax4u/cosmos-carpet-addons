@@ -1,4 +1,8 @@
 {
+  "carpet.rule.fullrangecfinditem.desc": "Allows all players to use the full-range /cfinditem search",
+  "carpet.rule.fullrangecfinditem.extra.0": "Searches containers in loaded chunks within render distance without opening them. Only ClientCommands is required on the client; this addon and Carpet are only required on the server.",
+  "carpet.rule.fullrangecfinditem.extra.1": "Advertises level-2 permissions to clients without granting server permissions. Other client features that check this permission indicator may also become available.",
+
   "carpet.rule.ghostProjectileFix.desc": "Fixes a projectile motion desync",
   "carpet.rule.ghostProjectileFix.extra.0": "overrides ghostEntitiesFix (the general fix for all entities) for projectiles",
 
