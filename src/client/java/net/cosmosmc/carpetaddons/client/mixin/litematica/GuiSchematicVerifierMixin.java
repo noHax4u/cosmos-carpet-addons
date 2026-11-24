@@ -46,8 +46,11 @@ public abstract class GuiSchematicVerifierMixin {
             String state = StringUtils.translate(LitematicaLightConfigs.LIGHT_OVERLAY_ENABLED.getBooleanValue()
                     ? "cosmos-carpet-addons.litematica.verifier.highlight_on" : "cosmos-carpet-addons.litematica.verifier.highlight_off");
             label = StringUtils.translate("cosmos-carpet-addons.litematica.verifier.light", light.mismatchCount(), state);
-            hover.add(StringUtils.translate("cosmos-carpet-addons.litematica.verifier.light.hover", light.checkedPositions()));
-            for (LightVerifier.LightMismatch mismatch : light.closestMismatchDetails(10)) {
+            for (String line : StringUtils.translate("cosmos-carpet-addons.litematica.verifier.light.hover", light.checkedPositions()).split("\\n")) {
+                hover.add(line);
+            }
+            var player = net.minecraft.client.Minecraft.getInstance().player;
+            for (LightVerifier.LightMismatch mismatch : light.closestMismatchDetails(player == null ? null : player.blockPosition(), 10)) {
                 hover.add(GuiBase.TXT_GOLD + mismatch.describe() + GuiBase.TXT_RST);
             }
         }

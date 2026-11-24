@@ -63,16 +63,12 @@ public final class LightVerifier {
         return closest;
     }
 
-    public List<LightMismatch> closestMismatchDetails(int max) {
-        List<LightMismatch> list = new ArrayList<>();
-        for (BlockPos pos : closest) {
-            LightMismatch mismatch = mismatches.get(pos.asLong());
-            if (mismatch != null) {
-                list.add(mismatch);
-                if (list.size() >= max) break;
-            }
-        }
-        return list;
+    /** @return up to {@code max} mismatches, closest to {@code center} first (independent of the periodic recheck) */
+    public List<LightMismatch> closestMismatchDetails(@Nullable BlockPos center, int max) {
+        return mismatches.values().stream()
+                .sorted(Comparator.comparingDouble(m -> center == null ? 0 : m.pos().distSqr(center)))
+                .limit(max)
+                .toList();
     }
 
     /**

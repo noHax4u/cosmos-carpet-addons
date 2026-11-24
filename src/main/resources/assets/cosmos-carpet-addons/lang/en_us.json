@@ -15,7 +15,7 @@
   "cosmos-carpet-addons.litematica.save.include_light": "Include light levels",
   "cosmos-carpet-addons.litematica.save.include_light.hover": "Also saves the block and sky light level of every position (Cosmos Carpet Addons).\nThe schematic still loads in Litematica without this addon, without the light data.\nNot used with 'Save from schematic world'.",
   "cosmos-carpet-addons.litematica.verifier.light": "Light: %s mismatches (%s)",
-  "cosmos-carpet-addons.litematica.verifier.light.hover": "Light levels checked at %s positions (Cosmos Carpet Addons). Click to toggle highlighting. Closest mismatches:",
+  "cosmos-carpet-addons.litematica.verifier.light.hover": "Light levels checked at %s positions (Cosmos Carpet Addons).\nClick to toggle highlighting. Closest mismatches:",
   "cosmos-carpet-addons.litematica.verifier.highlight_on": "shown",
   "cosmos-carpet-addons.litematica.verifier.highlight_off": "hidden",
   "cosmos-carpet-addons.litematica.verifier.no_light": "Light: no data",
