@@ -1,4 +1,4 @@
-package net.cosmosmc.carpetaddons.mixin.axiom;
+package net.cosmosmc.carpetaddons.mixin;
 
 import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.tree.ClassNode;
@@ -9,17 +9,17 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Only applies the Axiom integration mixins when Axiom is installed, so Axiom stays an optional dependency.
- * Used by both the common and the client Axiom mixin configs.
+ * Applies the mixins of an optional integration only when the mod it integrates with is installed, so these
+ * mods stay optional dependencies. The mod id is the last segment of the mixin config's package, e.g.
+ * {@code ...mixin.axiom} is only applied with Axiom, {@code ...mixin.litematica} only with Litematica.
  */
-public class AxiomMixinPlugin implements IMixinConfigPlugin {
-    public static final String AXIOM_MOD_ID = "axiom";
-
-    private boolean axiomLoaded;
+public class OptionalModMixinPlugin implements IMixinConfigPlugin {
+    private boolean modLoaded;
 
     @Override
     public void onLoad(String mixinPackage) {
-        axiomLoaded = FabricLoader.getInstance().isModLoaded(AXIOM_MOD_ID);
+        String modId = mixinPackage.substring(mixinPackage.lastIndexOf('.') + 1);
+        modLoaded = FabricLoader.getInstance().isModLoaded(modId);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class AxiomMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return axiomLoaded;
+        return modLoaded;
     }
 
     @Override

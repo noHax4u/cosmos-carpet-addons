@@ -122,6 +122,17 @@ and are only applied when Axiom is installed.
 Clients with this mod also stop relighting their own block changes while the rule is enabled, so what
 they see matches the server.
 
+#### Litematica integration (optional, client side)
+
+With [Litematica](https://modrinth.com/mod/litematica) installed on the client, the "Save schematic" screen gets
+an "Include light levels" option. It stores the block and sky light level of every position in the schematic
+(a `cca:Light` entry in each sub-region). Unmodified Litematica clients load these schematics normally and
+just ignore the light data (it is dropped if they save the schematic again).
+
+The schematic verifier then also verifies light levels: the "Light: N mismatches" button shows the count,
+lists the closest mismatches when hovered, and toggles highlighting them in the world (in the "different block"
+color). Fixed mismatches disappear within a second; new ones are found by running the verifier again.
+
 - Type: `boolean`
 - Default value: `false`
 - Accepted values: `true`, `false`
@@ -143,15 +154,16 @@ logs TNT minecart info useful for designing TNT minecart duping looters
 ./gradlew build
 ```
 
-The jar ends up in `build/libs`. Axiom is only needed at compile time (it is downloaded from Modrinth's
-Maven automatically) and is not bundled.
+The jar ends up in `build/libs`. Axiom and Litematica are only needed at compile time (they are downloaded
+from Modrinth's Maven automatically) and are not bundled.
 
-To test with Axiom in the dev environment, install it into `run/mods`, then run the client or server as usual:
+To test with Axiom and Litematica in the dev environment, install them into `run/mods`, then run the client
+or server as usual:
 
 ```
-./gradlew installAxiomDev
+./gradlew installDevMods
 ./gradlew runClient
-./gradlew removeAxiomDev
+./gradlew removeDevMods
 ```
 
 ## License

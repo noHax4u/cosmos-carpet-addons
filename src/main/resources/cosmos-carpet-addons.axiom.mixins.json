@@ -1,7 +1,7 @@
 {
 	"required": false,
 	"package": "net.cosmosmc.carpetaddons.mixin.axiom",
-	"plugin": "net.cosmosmc.carpetaddons.mixin.axiom.AxiomMixinPlugin",
+	"plugin": "net.cosmosmc.carpetaddons.mixin.OptionalModMixinPlugin",
 	"compatibilityLevel": "JAVA_25",
 	"priority": 1100,
 	"mixins": [

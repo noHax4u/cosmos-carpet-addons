@@ -10,5 +10,14 @@
 
   "carpet.rule.lightLevelManipulator.desc": "Lets you edit block and sky light levels directly",
   "carpet.rule.lightLevelManipulator.extra.0": "While enabled, block changes no longer cause light updates and placing a light item only sets the light level of that position (sky light if the item has an enchantment glint override)",
-  "carpet.rule.lightLevelManipulator.extra.1": "Also enables /lightmanipulator to get light items and fill areas with light levels, optionally from a WorldEdit-like expression"
+  "carpet.rule.lightLevelManipulator.extra.1": "Also enables /lightmanipulator to get light items and fill areas with light levels, optionally from a WorldEdit-like expression",
+
+  "cosmos-carpet-addons.litematica.save.include_light": "Include light levels",
+  "cosmos-carpet-addons.litematica.save.include_light.hover": "Also saves the block and sky light level of every position (Cosmos Carpet Addons).\nThe schematic still loads in Litematica without this addon, without the light data.\nNot used with 'Save from schematic world'.",
+  "cosmos-carpet-addons.litematica.verifier.light": "Light: %s mismatches (%s)",
+  "cosmos-carpet-addons.litematica.verifier.light.hover": "Light levels checked at %s positions (Cosmos Carpet Addons). Click to toggle highlighting. Closest mismatches:",
+  "cosmos-carpet-addons.litematica.verifier.highlight_on": "shown",
+  "cosmos-carpet-addons.litematica.verifier.highlight_off": "hidden",
+  "cosmos-carpet-addons.litematica.verifier.no_light": "Light: no data",
+  "cosmos-carpet-addons.litematica.verifier.no_light.hover": "This schematic has no light levels. Save it with 'Include light levels' to verify light."
 }

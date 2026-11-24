@@ -44,6 +44,8 @@ loom {
 configurations {
 	// only used to extract Axiom's nested API jar for compilation
 	axiom { transitive = false }
+	// optional mods installed into run/mods by installDevMods
+	devMods { transitive = false }
 }
 
 // Axiom's classes reference its client API, which is bundled inside the Axiom jar (jar-in-jar)
@@ -72,16 +74,24 @@ dependencies {
 	compileOnly "maven.modrinth:axiom:${project.axiom_version}"
 	axiom "maven.modrinth:axiom:${project.axiom_version}"
 	compileOnly files(layout.buildDirectory.file("axiom-api/axiomclientapi-unobf.jar")).builtBy(extractAxiomApi)
+
+	// Litematica: optional, never bundled. Its mixins are only applied when Litematica is installed.
+	compileOnly "maven.modrinth:litematica:${project.litematica_version}"
+	compileOnly "maven.modrinth:malilib:${project.malilib_version}"
+	devMods "maven.modrinth:axiom:${project.axiom_version}"
+	devMods "maven.modrinth:litematica:${project.litematica_version}"
+	devMods "maven.modrinth:malilib:${project.malilib_version}"
 }
 
-// Dev runs with Axiom: ./gradlew installAxiomDev, then runClient / runServer as usual; ./gradlew removeAxiomDev undoes it.
-// (Fabric Loader rejects Axiom on the dev classpath, so it goes into run/mods like a normal install.)
-tasks.register("installAxiomDev", Copy) {
-	from configurations.axiom
+// Dev runs with the optional integrations (Axiom, Litematica + MaLiLib): ./gradlew installDevMods,
+// then runClient / runServer as usual; ./gradlew removeDevMods undoes it.
+// (Fabric Loader rejects these mods on the dev classpath, so they go into run/mods like a normal install.)
+tasks.register("installDevMods", Copy) {
+	from configurations.devMods
 	into file("run/mods")
 }
-tasks.register("removeAxiomDev", Delete) {
-	delete fileTree("run/mods") { include "axiom-*.jar", "Axiom-*.jar" }
+tasks.register("removeDevMods", Delete) {
+	delete fileTree("run/mods") { include "axiom-*.jar", "litematica-*.jar", "malilib-*.jar" }
 }
 
 processResources {

@@ -32,6 +32,10 @@
 		{
 			"config": "cosmos-carpet-addons.axiom.client.mixins.json",
 			"environment": "client"
+		},
+		{
+			"config": "cosmos-carpet-addons.litematica.client.mixins.json",
+			"environment": "client"
 		}
 	],
 	"depends": {
@@ -42,7 +46,8 @@
 		"carpet": "*"
 	},
 	"suggests": {
-		"axiom": "*"
+		"axiom": "*",
+		"litematica": "*"
 	},
 	"custom": {
 		"modmenu": {

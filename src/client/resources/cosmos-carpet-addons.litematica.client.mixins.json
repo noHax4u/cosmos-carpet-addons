@@ -1,0 +1,17 @@
+{
+	"required": false,
+	"package": "net.cosmosmc.carpetaddons.client.mixin.litematica",
+	"plugin": "net.cosmosmc.carpetaddons.mixin.OptionalModMixinPlugin",
+	"compatibilityLevel": "JAVA_25",
+	"priority": 1100,
+	"client": [
+		"GuiSchematicSaveBaseMixin",
+		"GuiSchematicSaveButtonListenerMixin",
+		"GuiSchematicVerifierMixin",
+		"LitematicaSchematicMixin",
+		"SchematicVerifierMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
