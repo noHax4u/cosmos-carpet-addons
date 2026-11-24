@@ -8,7 +8,7 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.cosmosmc.carpetaddons.client.litematica.LightVerifier;
 import net.cosmosmc.carpetaddons.client.litematica.LightVerifierHolder;
-import net.cosmosmc.carpetaddons.client.litematica.LitematicaLightOptions;
+import net.cosmosmc.carpetaddons.client.litematica.LitematicaLightConfigs;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,11 +36,14 @@ public abstract class GuiSchematicVerifierMixin {
 
         String label;
         List<String> hover = new ArrayList<>();
-        if (!light.schematicHasLight()) {
+        if (!LitematicaLightConfigs.VERIFY_LIGHT.getBooleanValue()) {
+            label = StringUtils.translate("cosmos-carpet-addons.litematica.verifier.disabled");
+            hover.add(StringUtils.translate("cosmos-carpet-addons.litematica.verifier.disabled.hover"));
+        } else if (!light.schematicHasLight()) {
             label = StringUtils.translate("cosmos-carpet-addons.litematica.verifier.no_light");
             hover.add(StringUtils.translate("cosmos-carpet-addons.litematica.verifier.no_light.hover"));
         } else {
-            String state = StringUtils.translate(LitematicaLightOptions.highlightLightMismatches
+            String state = StringUtils.translate(LitematicaLightConfigs.LIGHT_OVERLAY_ENABLED.getBooleanValue()
                     ? "cosmos-carpet-addons.litematica.verifier.highlight_on" : "cosmos-carpet-addons.litematica.verifier.highlight_off");
             label = StringUtils.translate("cosmos-carpet-addons.litematica.verifier.light", light.mismatchCount(), state);
             hover.add(StringUtils.translate("cosmos-carpet-addons.litematica.verifier.light.hover", light.checkedPositions()));
@@ -55,8 +58,9 @@ public abstract class GuiSchematicVerifierMixin {
         int width = gui.getStringWidth(label) + 20;
         ButtonGeneric button = new ButtonGeneric(mainMenuX - width - 4, gui.getScreenHeight() - 36, width, 20, label, hover.toArray(String[]::new));
         gui.addButton(button, (b, mouseButton) -> {
-            if (light.schematicHasLight()) {
-                LitematicaLightOptions.highlightLightMismatches = !LitematicaLightOptions.highlightLightMismatches;
+            if (light.schematicHasLight() && LitematicaLightConfigs.VERIFY_LIGHT.getBooleanValue()) {
+                LitematicaLightConfigs.LIGHT_OVERLAY_ENABLED.toggleBooleanValue();
+                LitematicaLightConfigs.save();
                 gui.initGui();
             }
         });

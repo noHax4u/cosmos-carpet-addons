@@ -7,7 +7,7 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.cosmosmc.carpetaddons.client.litematica.LitematicaLightOptions;
+import net.cosmosmc.carpetaddons.client.litematica.LitematicaLightConfigs;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,8 +37,11 @@ public abstract class GuiSchematicSaveBaseMixin {
         WidgetCheckBox checkbox = new WidgetCheckBox(x, 59, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED,
                 StringUtils.translate("cosmos-carpet-addons.litematica.save.include_light"),
                 StringUtils.translate("cosmos-carpet-addons.litematica.save.include_light.hover"));
-        checkbox.setChecked(LitematicaLightOptions.includeLightWhenSaving, false);
-        checkbox.setListener(widget -> LitematicaLightOptions.includeLightWhenSaving = widget.isChecked());
+        checkbox.setChecked(LitematicaLightConfigs.SAVE_INCLUDE_LIGHT.getBooleanValue(), false);
+        checkbox.setListener(widget -> {
+            LitematicaLightConfigs.SAVE_INCLUDE_LIGHT.setBooleanValue(widget.isChecked());
+            LitematicaLightConfigs.save();
+        });
         gui.addWidget(checkbox);
     }
 }

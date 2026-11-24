@@ -120,7 +120,7 @@ public final class LightVerifier {
             return;
         }
         schematicHasLight = true;
-        boolean checkSky = mapping.light().hasSky() && world.dimensionType().hasSkyLight();
+        boolean checkSky = mapping.light().hasSky() && world.dimensionType().hasSkyLight() && LitematicaLightConfigs.VERIFY_SKY_LIGHT.getBooleanValue();
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
         for (int y = box.minY(); y <= box.maxY(); y++) {
@@ -165,7 +165,7 @@ public final class LightVerifier {
                 }
             }
         }
-        boolean checkSky = world.dimensionType().hasSkyLight();
+        boolean checkSky = world.dimensionType().hasSkyLight() && LitematicaLightConfigs.VERIFY_SKY_LIGHT.getBooleanValue();
 
         for (LightMismatch mismatch : new ArrayList<>(mismatches.values())) {
             BlockPos pos = mismatch.pos();

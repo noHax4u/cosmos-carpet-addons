@@ -5,10 +5,13 @@
 	"compatibilityLevel": "JAVA_25",
 	"priority": 1100,
 	"client": [
+		"ConfigsMixin",
+		"GuiConfigsMixin",
 		"GuiSchematicSaveBaseMixin",
 		"GuiSchematicSaveButtonListenerMixin",
 		"GuiSchematicVerifierMixin",
 		"LitematicaSchematicMixin",
+		"OverlayRendererMixin",
 		"SchematicVerifierMixin"
 	],
 	"injectors": {

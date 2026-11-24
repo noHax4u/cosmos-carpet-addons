@@ -130,10 +130,21 @@ an "Include light levels" option. It stores the block and sky light level of eve
 just ignore the light data (it is dropped if they save the schematic again).
 
 The schematic verifier then also verifies light levels: the "Light: N mismatches" button shows the count,
-lists the closest mismatches when hovered, and toggles highlighting them in the world (off by default; in the
-"different block" color, and not on blocks that already show another verifier marker). Fixed mismatches and
+lists the closest mismatches when hovered, and toggles highlighting them in the world. Fixed mismatches and
 mismatches the placement no longer covers (e.g. after moving it) disappear within a second; new ones are found by
 running the verifier again.
+
+Options are added to Litematica's config screen (stored in `config/cosmos-carpet-addons-litematica.json`):
+
+| Tab | Option | Default |
+|---|---|---|
+| Generic | Save: Include Light Levels (default of the save screen checkbox) | off |
+| Generic | Verifier: Check Light Levels | on |
+| Generic | Verifier: Check Sky Light | on |
+| Info Overlays | Verifier Light Overlay | off |
+| Info Overlays | Verifier Light Overlay Over Other Markers | off |
+| Info Overlays | Verifier Light Overlay Max Positions | 1000 |
+| Colors | Schematic Overlay Color Wrong Light | `#FF9966FF` |
 
 - Type: `boolean`
 - Default value: `false`

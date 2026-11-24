@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import net.cosmosmc.carpetaddons.client.litematica.LightSchematic;
-import net.cosmosmc.carpetaddons.client.litematica.LitematicaLightOptions;
+import net.cosmosmc.carpetaddons.client.litematica.LitematicaLightConfigs;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -24,7 +24,7 @@ public abstract class GuiSchematicSaveButtonListenerMixin {
     private LitematicaSchematic cca$captureLight(AreaSelection area, String author, Operation<LitematicaSchematic> original) {
         LitematicaSchematic schematic = original.call(area, author);
         if (schematic != null) {
-            ((LightSchematic) schematic).cca$setCapturesLight(LitematicaLightOptions.includeLightWhenSaving);
+            ((LightSchematic) schematic).cca$setCapturesLight(LitematicaLightConfigs.SAVE_INCLUDE_LIGHT.getBooleanValue());
         }
         return schematic;
     }
