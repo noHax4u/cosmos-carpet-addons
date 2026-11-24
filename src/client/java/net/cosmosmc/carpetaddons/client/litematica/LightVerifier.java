@@ -85,7 +85,7 @@ public final class LightVerifier {
             RegionLight light = schematic == null ? null : ((LightSchematic) schematic).cca$getRegionLight(regionName);
             SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
             Vec3i regionSize = schematic == null ? null : schematic.getAreaSizeAsVec3i(regionName);
-            if (light == null || placement == null || regionSize == null) {
+            if (light == null || placement == null || !placement.isEnabled() || regionSize == null) {
                 return null;
             }
             BlockPos regionPos = placement.getPos();
@@ -151,19 +151,54 @@ public final class LightVerifier {
     }
 
     /**
+     * Re-checks the known mismatches against the placement's current position, rotation and mirror: the placement
+     * may have been moved since they were found. Positions it no longer covers are dropped.
+     */
+    private void recheck(ClientLevel world, SchematicPlacement schematicPlacement) {
+        List<RegionMapping> mappings = new ArrayList<>();
+        LitematicaSchematic schematic = schematicPlacement.getSchematic();
+        if (schematic != null) {
+            for (String regionName : schematic.getAreaSizes().keySet()) {
+                RegionMapping mapping = RegionMapping.of(schematicPlacement, regionName);
+                if (mapping != null) {
+                    mappings.add(mapping);
+                }
+            }
+        }
+        boolean checkSky = world.dimensionType().hasSkyLight();
+
+        for (LightMismatch mismatch : new ArrayList<>(mismatches.values())) {
+            BlockPos pos = mismatch.pos();
+            RegionMapping covering = null;
+            BlockPos rel = null;
+            for (RegionMapping mapping : mappings) {
+                rel = mapping.toRegion(pos);
+                if (mapping.light().contains(rel.getX(), rel.getY(), rel.getZ())) {
+                    covering = mapping;
+                    break;
+                }
+            }
+            if (covering == null) {
+                mismatches.remove(pos.asLong());
+            } else if (world.hasChunkAt(pos)) {
+                int expectedSky = checkSky && covering.light().hasSky() ? covering.light().getSky(rel.getX(), rel.getY(), rel.getZ()) : -1;
+                check(world, pos, covering.light().getBlock(rel.getX(), rel.getY(), rel.getZ()), expectedSky);
+            }
+        }
+    }
+
+    /**
      * Called every client tick while the verifier exists: once it has finished, re-checks the known
      * mismatches (so fixed ones disappear) and updates the closest positions to highlight.
      */
-    public void tick(ClientLevel world, boolean finished, @Nullable BlockPos center, int maxHighlighted) {
+    public void tick(ClientLevel world, @Nullable SchematicPlacement schematicPlacement, boolean finished, @Nullable BlockPos center, int maxHighlighted) {
         if (++ticks % RECHECK_INTERVAL_TICKS != 0 || world == null) {
             return;
         }
-        if (finished && !mismatches.isEmpty()) {
-            for (LightMismatch mismatch : new ArrayList<>(mismatches.values())) {
-                if (world.hasChunkAt(mismatch.pos())) {
-                    check(world, mismatch.pos(), mismatch.expectedBlock(), mismatch.expectedSky());
-                }
-            }
+        if (schematicPlacement == null) {
+            mismatches.clear();
+        } else if (finished && !mismatches.isEmpty()) {
+            recheck(world, schematicPlacement);
         }
         if (center != null) {
             closest = mismatches.values().stream()

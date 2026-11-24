@@ -61,7 +61,7 @@ public abstract class SchematicVerifierMixin implements LightVerifierHolder {
     @Inject(method = "execute", at = @At("TAIL"))
     private void cca$tickLight(ProfilerFiller profiler, CallbackInfoReturnable<Boolean> cir) {
         var player = Minecraft.getInstance().player;
-        cca$lightVerifier.tick(worldClient, isFinished(), player == null ? null : player.blockPosition(),
+        cca$lightVerifier.tick(worldClient, schematicPlacement, isFinished(), player == null ? null : player.blockPosition(),
                 Configs.InfoOverlays.VERIFIER_ERROR_HILIGHT_MAX_POSITIONS.getIntegerValue());
     }
 

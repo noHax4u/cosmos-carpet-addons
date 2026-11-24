@@ -130,8 +130,10 @@ an "Include light levels" option. It stores the block and sky light level of eve
 just ignore the light data (it is dropped if they save the schematic again).
 
 The schematic verifier then also verifies light levels: the "Light: N mismatches" button shows the count,
-lists the closest mismatches when hovered, and toggles highlighting them in the world (in the "different block"
-color). Fixed mismatches disappear within a second; new ones are found by running the verifier again.
+lists the closest mismatches when hovered, and toggles highlighting them in the world (off by default; in the
+"different block" color, and not on blocks that already show another verifier marker). Fixed mismatches and
+mismatches the placement no longer covers (e.g. after moving it) disappear within a second; new ones are found by
+running the verifier again.
 
 - Type: `boolean`
 - Default value: `false`

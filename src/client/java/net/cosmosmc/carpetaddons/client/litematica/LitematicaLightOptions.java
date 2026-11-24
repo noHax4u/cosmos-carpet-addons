@@ -5,7 +5,7 @@ public final class LitematicaLightOptions {
     public static boolean includeLightWhenSaving = false;
 
     /** Whether light mismatches found by the schematic verifier are highlighted in the world. */
-    public static boolean highlightLightMismatches = true;
+    public static boolean highlightLightMismatches = false;
 
     private LitematicaLightOptions() {
     }
