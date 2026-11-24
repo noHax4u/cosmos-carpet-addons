@@ -21,6 +21,11 @@ repositories {
 	}
 }
 
+sourceSets {
+	// empty source set for runClientWithoutCca: the dependencies without this mod's classes
+	withoutCca {}
+}
+
 loom {
 	splitEnvironmentSourceSets()
 
@@ -38,10 +43,19 @@ loom {
 			// Fabric has no load order setting and shuffles mods in dev; load this mod last in dev runs
 			vmArg "-Dfabric.debug.loadLate=cosmos-carpet-addons"
 		}
+		// ./gradlew runClientWithoutCca: a client with the same dependencies and run/mods, but without this mod
+		// (e.g. to check that schematics saved with light data still load in unmodified Litematica)
+		clientWithoutCca {
+			client()
+			configName = "Minecraft Client (without Cosmos Carpet Addons)"
+			source sourceSets.withoutCca
+			runDir "run"
+		}
 	}
 }
 
 configurations {
+	withoutCcaRuntimeClasspath.extendsFrom clientRuntimeClasspath
 	// only used to extract Axiom's nested API jar for compilation
 	axiom { transitive = false }
 	// optional mods installed into run/mods by installDevMods

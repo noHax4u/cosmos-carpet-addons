@@ -166,6 +166,9 @@ or server as usual:
 ./gradlew removeDevMods
 ```
 
+`./gradlew runClientWithoutCca` starts a client with the same dependencies and `run/mods`, but without this mod,
+e.g. to check that schematics saved with light data still load in unmodified Litematica.
+
 ## License
 
 This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
