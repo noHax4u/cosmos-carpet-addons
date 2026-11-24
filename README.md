@@ -107,6 +107,16 @@ Notes:
   blocks they change themselves, so they may show vanilla lighting around those blocks until the
   chunk is reloaded.
 
+#### Client options
+
+With this mod on the client, a config screen (via [Mod Menu](https://modrinth.com/mod/modmenu), optional) has:
+
+- **Light Level Display** (on): while holding a light item, shows the light level where it would be placed:
+  block light for normal light items, sky light for light items with an enchantment glint override, both for
+  nether portal items.
+- **Axiom No Updates: Skip Light** (off): Axiom's "no updates" mode also skips light updates for the blocks you
+  place or break. Needs Axiom and this mod on the server.
+
 #### Axiom integration (optional)
 
 If [Axiom](https://modrinth.com/mod/axiom) is installed on the server and on the builder's client

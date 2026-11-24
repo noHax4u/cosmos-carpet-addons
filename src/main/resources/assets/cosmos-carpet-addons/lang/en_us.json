@@ -46,5 +46,14 @@
   "cosmos-carpet-addons.litematica.verifier.disabled.hover": "Light level verification is turned off in the Litematica config (Generic tab).",
   "cosmos-carpet-addons.litematica.config.name.schematicPasteIncludeLight": "schematicPasteIncludeLight",
   "cosmos-carpet-addons.litematica.config.prettyName.schematicPasteIncludeLight": "Paste: Include Light Levels",
-  "cosmos-carpet-addons.litematica.config.comment.schematicPasteIncludeLight": "Also paste the light levels stored in schematics, in singleplayer and\nwith Servux on servers that have Cosmos Carpet Addons.\nNeeds the lightLevelManipulator rule to be enabled (Cosmos Carpet Addons)"
+  "cosmos-carpet-addons.litematica.config.comment.schematicPasteIncludeLight": "Also paste the light levels stored in schematics, in singleplayer and\nwith Servux on servers that have Cosmos Carpet Addons.\nNeeds the lightLevelManipulator rule to be enabled (Cosmos Carpet Addons)",
+
+  "cosmos-carpet-addons.config.title": "Cosmos Carpet Addons",
+  "cosmos-carpet-addons.config.showLightLevelWhenHoldingLightItem": "Light Level Display",
+  "cosmos-carpet-addons.config.showLightLevelWhenHoldingLightItem.tooltip": "While holding a light item, show the light level where it would be placed: block light for normal light items, sky light for light items with an enchantment glint, both for nether portal items.",
+  "cosmos-carpet-addons.config.axiomNoUpdatesSkipsLight": "Axiom No Updates: Skip Light",
+  "cosmos-carpet-addons.config.axiomNoUpdatesSkipsLight.tooltip": "Axiom's \"no updates\" mode also skips light updates for the blocks you place or break. Needs Axiom and Cosmos Carpet Addons on the server.",
+  "cosmos-carpet-addons.hud.light_level.block": "Block light: %s",
+  "cosmos-carpet-addons.hud.light_level.sky": "Sky light: %s",
+  "cosmos-carpet-addons.hud.light_level.both": "Block light: %s, sky light: %s"
 }

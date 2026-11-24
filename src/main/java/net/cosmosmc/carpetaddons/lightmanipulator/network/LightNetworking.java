@@ -17,6 +17,8 @@ import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Map;
 import java.util.UUID;
 
@@ -34,6 +36,7 @@ public final class LightNetworking {
     }
 
     private static final Map<UUID, Pending> PENDING = new HashMap<>();
+    private static final Set<UUID> AXIOM_NO_UPDATES_SKIPS_LIGHT = new HashSet<>();
     private static int tick = 0;
 
     private LightNetworking() {
@@ -42,11 +45,27 @@ public final class LightNetworking {
     public static void init() {
         PayloadTypeRegistry.clientboundPlay().register(ManipulatorStatePayload.TYPE, ManipulatorStatePayload.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(SourceLightPayload.TYPE, SourceLightPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(ClientOptionsPayload.TYPE, ClientOptionsPayload.CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(SourceLightPayload.TYPE, (payload, context) -> receiveSourceLight(context.player(), payload));
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> sendState(handler.getPlayer()));
-        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> PENDING.remove(handler.getPlayer().getUUID()));
+        ServerPlayNetworking.registerGlobalReceiver(ClientOptionsPayload.TYPE, (payload, context) -> {
+            if (payload.axiomNoUpdatesSkipsLight()) {
+                AXIOM_NO_UPDATES_SKIPS_LIGHT.add(context.player().getUUID());
+            } else {
+                AXIOM_NO_UPDATES_SKIPS_LIGHT.remove(context.player().getUUID());
+            }
+        });
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            PENDING.remove(handler.getPlayer().getUUID());
+            AXIOM_NO_UPDATES_SKIPS_LIGHT.remove(handler.getPlayer().getUUID());
+        });
         ServerTickEvents.END_SERVER_TICK.register(server -> expirePending());
+    }
+
+    /** Whether the player asked for Axiom's "no updates" mode to also skip light updates (client option). */
+    public static boolean axiomNoUpdatesSkipsLight(ServerPlayer player) {
+        return AXIOM_NO_UPDATES_SKIPS_LIGHT.contains(player.getUUID());
     }
 
     public static void sendState(ServerPlayer player) {

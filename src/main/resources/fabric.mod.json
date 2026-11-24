@@ -20,6 +20,9 @@
 		],
 		"client": [
 			"net.cosmosmc.carpetaddons.client.CosmosCarpetAddonsClient"
+		],
+		"modmenu": [
+			"net.cosmosmc.carpetaddons.client.ModMenuIntegration"
 		]
 	},
 	"mixins": [
@@ -49,7 +52,8 @@
 	"suggests": {
 		"axiom": "*",
 		"litematica": "*",
-		"servux": "*"
+		"servux": "*",
+		"modmenu": "*"
 	},
 	"custom": {
 		"modmenu": {

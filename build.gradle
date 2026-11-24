@@ -94,13 +94,16 @@ dependencies {
 	compileOnly "maven.modrinth:malilib:${project.malilib_version}"
 	// Servux: optional, never bundled. Its mixins are only applied when Servux is installed.
 	compileOnly "maven.modrinth:servux:${project.servux_version}"
+	// Mod Menu: optional, never bundled. Only used through the "modmenu" entrypoint.
+	compileOnly "maven.modrinth:modmenu:${project.modmenu_version}"
+	devMods "maven.modrinth:modmenu:${project.modmenu_version}"
 	devMods "maven.modrinth:axiom:${project.axiom_version}"
 	devMods "maven.modrinth:servux:${project.servux_version}"
 	devMods "maven.modrinth:litematica:${project.litematica_version}"
 	devMods "maven.modrinth:malilib:${project.malilib_version}"
 }
 
-// Dev runs with the optional integrations (Axiom, Litematica + MaLiLib, Servux): ./gradlew installDevMods,
+// Dev runs with the optional integrations (Axiom, Litematica + MaLiLib, Servux, Mod Menu): ./gradlew installDevMods,
 // then runClient / runServer as usual; ./gradlew removeDevMods undoes it.
 // (Fabric Loader rejects these mods on the dev classpath, so they go into run/mods like a normal install.)
 tasks.register("installDevMods", Copy) {
@@ -108,7 +111,7 @@ tasks.register("installDevMods", Copy) {
 	into file("run/mods")
 }
 tasks.register("removeDevMods", Delete) {
-	delete fileTree("run/mods") { include "axiom-*.jar", "litematica-*.jar", "malilib-*.jar", "servux-*.jar" }
+	delete fileTree("run/mods") { include "axiom-*.jar", "litematica-*.jar", "malilib-*.jar", "servux-*.jar", "modmenu-*.jar" }
 }
 
 processResources {
