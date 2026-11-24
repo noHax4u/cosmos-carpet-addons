@@ -2,12 +2,17 @@ package net.cosmosmc.carpetaddons;
 
 import carpet.CarpetExtension;
 import carpet.CarpetServer;
+import carpet.utils.CommandHelper;
+import com.mojang.brigadier.CommandDispatcher;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.Strictness;
 import com.google.gson.reflect.TypeToken;
+import net.cosmosmc.carpetaddons.lightmanipulator.LightManipulatorCommand;
 import net.cosmosmc.carpetaddons.logging.Loggers;
 import net.cosmosmc.carpetaddons.settings.CosmosCarpetAddonsSettings;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -32,12 +37,20 @@ public class CosmosCarpetAddonsServer implements CarpetExtension {
     }
 
     @Override
+    public void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandBuildContext) {
+        LightManipulatorCommand.register(dispatcher);
+    }
+
+    @Override
     public void onGameStarted() {
         CarpetServer.settingsManager.parseSettingsClass(CosmosCarpetAddonsSettings.class);
         CarpetServer.settingsManager.registerRuleObserver((source, rule, value) -> {
             if (source != null && rule.name().equals("fullrangecfinditem")) {
                 var playerList = source.getServer().getPlayerList();
                 playerList.getPlayers().forEach(playerList::sendPlayerPermissionLevel);
+            }
+            if (source != null && rule.name().equals("lightLevelManipulator")) {
+                CommandHelper.notifyPlayersCommandsChanged(source.getServer());
             }
         });
     }

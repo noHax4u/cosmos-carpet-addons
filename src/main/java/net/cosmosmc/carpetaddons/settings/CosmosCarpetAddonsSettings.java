@@ -42,4 +42,7 @@ public class CosmosCarpetAddonsSettings {
             validators = { SyncTimeValidator.class }
     )
     public static int ghostEntitiesFix = 0;
+
+    @Rule(categories = {CREATIVE, COMMAND, CCA})
+    public static boolean lightLevelManipulator = false;
 }

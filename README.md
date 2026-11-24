@@ -50,6 +50,60 @@ by sending their position and motion for the specified number of ticks after bei
 - Accepted values: [0 - 10]
 - Categories: `CCA`, `bugfix`
 
+### lightLevelManipulator
+
+Lets you edit block light and sky light levels directly, without light propagation.
+
+While enabled:
+
+- Block changes no longer trigger light updates (similar to carpet's old `lightUpdates ignored`).
+  Lighting of newly generated chunks still works.
+- Using a light item (`minecraft:light`) does not place a light block. It only sets the light level
+  of that position to the item's level. Items with the `minecraft:enchantment_glint_override`
+  component set to `true` set the sky light instead of the block light.
+- The `/lightmanipulator` command is available (requires op permission level 2):
+
+```
+/lightmanipulator give (block|sky) [<level>] [<targets>]
+/lightmanipulator fill <from> <to> (block|sky) <level>
+/lightmanipulator generate <from> <to> (block|sky) [normalized|raw|offset|center] <expression>
+```
+
+`give` hands out a light item for the given level (default 0); the `sky` variant has the glint override set.
+
+`generate` works like WorldEdit's `//generate`: the expression is evaluated for every position
+and its result is used as the light level (rounded and clamped to 0 - 15). A negative result
+leaves the position unchanged. Available variables are `x`, `y`, `z` and `cur` (the current light level).
+The coordinate mode selects what `x`, `y` and `z` are:
+
+- `normalized` (default): -1 to 1 across the area, 0 at its center
+- `raw`: world coordinates
+- `offset`: relative to the position the command is run from
+- `center`: relative to the center of the area, in blocks
+
+Operators: `+ - * / % ^` (or `**`), `== != < <= > >=`, `&& || !`, `cond ? a : b`.
+Functions: `abs sqrt cbrt sin cos tan asin acos atan atan2 sinh cosh tanh exp ln log log10
+floor ceil round rint min max pow hypot clamp random`. Constants: `pi`, `e`.
+
+Example: a glowing sphere that fades towards its edge
+
+```
+/lightmanipulator generate ~-10 ~-10 ~-10 ~10 ~10 ~10 block 15 * (1 - sqrt(x^2 + y^2 + z^2))
+```
+
+Notes:
+
+- Areas are limited to 16,777,216 positions and must be loaded.
+- Positions in sections that store no light data (e.g. high above the terrain) are skipped.
+- Edited light stays until something triggers a light update there after the rule is disabled.
+- Clients still compute light locally for blocks they change, so they may briefly show vanilla
+  lighting around changed blocks until the server resends the chunk's light.
+
+- Type: `boolean`
+- Default value: `false`
+- Accepted values: `true`, `false`
+- Categories: `CCA`, `creative`, `command`
+
 ## Loggers
 
 ### TNTCart

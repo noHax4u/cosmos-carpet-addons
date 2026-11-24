@@ -1,2 +1,11 @@
 classTweaker  v1  official
 accessible method net/minecraft/world/entity/vehicle/minecart/MinecartTNT damageSourceIgnitesTnt (Lnet/minecraft/world/damagesource/DamageSource;)Z
+
+# light level manipulator
+accessible class net/minecraft/server/level/ThreadedLevelLightEngine$TaskType
+accessible field net/minecraft/world/level/lighting/LevelLightEngine blockEngine Lnet/minecraft/world/level/lighting/LightEngine;
+accessible field net/minecraft/world/level/lighting/LevelLightEngine skyEngine Lnet/minecraft/world/level/lighting/LightEngine;
+accessible field net/minecraft/world/level/lighting/LightEngine storage Lnet/minecraft/world/level/lighting/LayerLightSectionStorage;
+accessible method net/minecraft/world/level/lighting/LayerLightSectionStorage storingLightForSection (J)Z
+accessible method net/minecraft/world/level/lighting/LayerLightSectionStorage getStoredLevel (J)I
+accessible method net/minecraft/world/level/lighting/LayerLightSectionStorage setStoredLevel (JI)V

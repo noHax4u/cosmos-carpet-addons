@@ -6,5 +6,9 @@
   "carpet.rule.ghostProjectileFix.desc": "Fixes a projectile motion desync",
   "carpet.rule.ghostProjectileFix.extra.0": "overrides ghostEntitiesFix (the general fix for all entities) for projectiles",
 
-  "carpet.rule.ghostEntitiesFix.desc": "Fixes an entity motion desync"
+  "carpet.rule.ghostEntitiesFix.desc": "Fixes an entity motion desync",
+
+  "carpet.rule.lightLevelManipulator.desc": "Lets you edit block and sky light levels directly",
+  "carpet.rule.lightLevelManipulator.extra.0": "While enabled, block changes no longer cause light updates and placing a light item only sets the light level of that position (sky light if the item has an enchantment glint override)",
+  "carpet.rule.lightLevelManipulator.extra.1": "Also enables /lightmanipulator to get light items and fill areas with light levels, optionally from a WorldEdit-like expression"
 }
