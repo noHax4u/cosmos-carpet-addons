@@ -46,5 +46,5 @@
   "cosmos-carpet-addons.litematica.verifier.disabled.hover": "Light level verification is turned off in the Litematica config (Generic tab).",
   "cosmos-carpet-addons.litematica.config.name.schematicPasteIncludeLight": "schematicPasteIncludeLight",
   "cosmos-carpet-addons.litematica.config.prettyName.schematicPasteIncludeLight": "Paste: Include Light Levels",
-  "cosmos-carpet-addons.litematica.config.comment.schematicPasteIncludeLight": "Also paste the light levels stored in schematics, in singleplayer and\\nwith Servux on servers that have Cosmos Carpet Addons.\\nNeeds the lightLevelManipulator rule to be enabled (Cosmos Carpet Addons)"
+  "cosmos-carpet-addons.litematica.config.comment.schematicPasteIncludeLight": "Also paste the light levels stored in schematics, in singleplayer and\nwith Servux on servers that have Cosmos Carpet Addons.\nNeeds the lightLevelManipulator rule to be enabled (Cosmos Carpet Addons)"
 }
