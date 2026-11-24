@@ -1,0 +1,52 @@
+# Mirrors published GitHub releases to Modrinth: same version (tag), name, changelog and mod jar.
+# Pre-releases become beta versions on Modrinth.
+#
+# Needs the repository secret MODRINTH_TOKEN (Modrinth PAT with "Create versions")
+# and the repository variable MODRINTH_PROJECT_ID.
+
+name: modrinth
+on:
+  release:
+    types: [published]
+
+jobs:
+  modrinth:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+      - name: download mod jar from the release
+        id: mod
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          mkdir dist
+          gh release download "$TAG" --dir dist --pattern '*.jar'
+          jars=$(find dist -maxdepth 1 -name '*.jar' ! -name '*-sources.jar')
+          if [ "$(echo "$jars" | grep -c .)" -ne 1 ]; then
+            echo "expected exactly one mod jar in release $TAG, found: $jars" >&2
+            exit 1
+          fi
+          echo "jar=$jars" >> "$GITHUB_OUTPUT"
+          echo "minecraft=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_OUTPUT"
+      - name: publish Modrinth version
+        uses: cloudnode-pro/modrinth-publish@v2
+        with:
+          token: ${{ secrets.MODRINTH_TOKEN }}
+          project: ${{ vars.MODRINTH_PROJECT_ID }}
+          version: ${{ github.event.release.tag_name }}
+          name: ${{ github.event.release.name || github.event.release.tag_name }}
+          changelog: ${{ github.event.release.body }}
+          channel: ${{ github.event.release.prerelease && 'beta' || 'release' }}
+          loaders: fabric
+          game-versions: ${{ steps.mod.outputs.minecraft }}
+          files: ${{ steps.mod.outputs.jar }}
+          dependencies: |-
+            [
+              {"project_id": "P7dR8mSH", "dependency_type": "required"},
+              {"project_id": "TQTTVgYE", "dependency_type": "required"},
+              {"project_id": "N6n5dqoA", "dependency_type": "optional"}
+            ]
