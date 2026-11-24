@@ -2,25 +2,18 @@
   "carpet.rule.fullrangecfinditem.desc": "Allows all players to use the full-range /cfinditem search",
   "carpet.rule.fullrangecfinditem.extra.0": "Searches containers in loaded chunks within render distance without opening them. Only ClientCommands is required on the client; this addon and Carpet are only required on the server.",
   "carpet.rule.fullrangecfinditem.extra.1": "Advertises level-2 permissions to clients without granting server permissions. Other client features that check this permission indicator may also become available.",
-
   "carpet.rule.ghostProjectileFix.desc": "Fixes a projectile motion desync",
   "carpet.rule.ghostProjectileFix.extra.0": "overrides ghostEntitiesFix (the general fix for all entities) for projectiles",
-
   "carpet.rule.ghostEntitiesFix.desc": "Fixes an entity motion desync",
-
   "carpet.rule.lightLevelManipulator.desc": "Lets you edit block and sky light levels directly",
   "carpet.rule.lightLevelManipulator.extra.0": "While enabled, block changes no longer cause light updates and placing a light item only sets the light level of that position (sky light if the item has an enchantment glint override)",
   "carpet.rule.lightLevelManipulator.extra.1": "Also enables /lightmanipulator to get light items and fill areas with light levels, optionally from a WorldEdit-like expression",
-
   "cosmos-carpet-addons.litematica.save.include_light": "Include light levels",
   "cosmos-carpet-addons.litematica.save.include_light.hover": "Also saves the block and sky light level of every position (Cosmos Carpet Addons).\nThe schematic still loads in Litematica without this addon, without the light data.\nNot used with 'Save from schematic world'.",
-  "cosmos-carpet-addons.litematica.verifier.light": "Light: %s mismatches (%s)",
-  "cosmos-carpet-addons.litematica.verifier.light.hover": "Light levels checked at %s positions (Cosmos Carpet Addons).\nClick to toggle highlighting. Closest mismatches:",
-  "cosmos-carpet-addons.litematica.verifier.highlight_on": "shown",
-  "cosmos-carpet-addons.litematica.verifier.highlight_off": "hidden",
+  "cosmos-carpet-addons.litematica.verifier.light": "Wrong Light: %s",
+  "cosmos-carpet-addons.litematica.verifier.light.hover": "Light levels checked at %s positions (Cosmos Carpet Addons).\nClick to open the wrong light levels tab. Closest mismatches:",
   "cosmos-carpet-addons.litematica.verifier.no_light": "Light: no data",
   "cosmos-carpet-addons.litematica.verifier.no_light.hover": "This schematic has no light levels. Save it with 'Include light levels' to verify light.",
-
   "cosmos-carpet-addons.litematica.config.name.schematicSaveIncludeLight": "schematicSaveIncludeLight",
   "cosmos-carpet-addons.litematica.config.prettyName.schematicSaveIncludeLight": "Save: Include Light Levels",
   "cosmos-carpet-addons.litematica.config.comment.schematicSaveIncludeLight": "Default state of the \"Include light levels\" option on the save schematic screen (Cosmos Carpet Addons)",
@@ -47,7 +40,6 @@
   "cosmos-carpet-addons.litematica.config.name.schematicPasteIncludeLight": "schematicPasteIncludeLight",
   "cosmos-carpet-addons.litematica.config.prettyName.schematicPasteIncludeLight": "Paste: Include Light Levels",
   "cosmos-carpet-addons.litematica.config.comment.schematicPasteIncludeLight": "Also paste the light levels stored in schematics, in singleplayer and\nwith Servux on servers that have Cosmos Carpet Addons.\nNeeds the lightLevelManipulator rule to be enabled (Cosmos Carpet Addons)",
-
   "cosmos-carpet-addons.config.title": "Cosmos Carpet Addons",
   "cosmos-carpet-addons.config.showLightLevelWhenHoldingLightItem": "Light Level Display",
   "cosmos-carpet-addons.config.showLightLevelWhenHoldingLightItem.tooltip": "While holding a light item, show the light level where it would be placed: block light for normal light items, sky light for light items with an enchantment glint, both for nether portal items.",
@@ -55,5 +47,26 @@
   "cosmos-carpet-addons.config.axiomNoUpdatesSkipsLight.tooltip": "Axiom's \"no updates\" mode also skips light updates for the blocks you place or break. Needs Axiom and Cosmos Carpet Addons on the server.",
   "cosmos-carpet-addons.hud.light_level.block": "Block light: %s",
   "cosmos-carpet-addons.hud.light_level.sky": "Sky light: %s",
-  "cosmos-carpet-addons.hud.light_level.both": "Block light: %s, sky light: %s"
+  "cosmos-carpet-addons.hud.light_level.both": "Block light: %s, sky light: %s",
+  "cosmos-carpet-addons.litematica.light_tab.title": "Schematic Verifier => Wrong Light Levels",
+  "cosmos-carpet-addons.litematica.light_tab.back": "Back",
+  "cosmos-carpet-addons.litematica.light_tab.highlight_on": "Highlight: ON",
+  "cosmos-carpet-addons.litematica.light_tab.highlight_off": "Highlight: OFF",
+  "cosmos-carpet-addons.litematica.light_tab.highlight.hover": "Highlight wrong light levels in the world (only the selected categories, or all if none are selected)",
+  "cosmos-carpet-addons.litematica.light_tab.reset_ignored": "Reset ignored (%s)",
+  "cosmos-carpet-addons.litematica.light_tab.summary": "%s positions with wrong light levels (%s positions checked)",
+  "cosmos-carpet-addons.litematica.light_tab.none": "No wrong light levels",
+  "cosmos-carpet-addons.litematica.light_tab.no_data": "This schematic has no light levels",
+  "cosmos-carpet-addons.litematica.light_tab.block": "Block light",
+  "cosmos-carpet-addons.litematica.light_tab.sky": "Sky light",
+  "cosmos-carpet-addons.litematica.light_tab.row": "%s: expected %s, found %s (%s)",
+  "cosmos-carpet-addons.litematica.light_tab.select": "Highlight",
+  "cosmos-carpet-addons.litematica.light_tab.selected": "Highlighted",
+  "cosmos-carpet-addons.litematica.light_tab.select.hover": "Only highlight the selected categories (none selected: highlight all)",
+  "cosmos-carpet-addons.litematica.light_tab.ignore": "Ignore",
+  "cosmos-carpet-addons.litematica.light_tab.ignore.hover": "Ignore this kind of wrong light level until the ignored categories are reset",
+  "cosmos-carpet-addons.litematica.light_tab.page": "Page %s / %s",
+  "cosmos-carpet-addons.litematica.info.title": "Wrong light level",
+  "cosmos-carpet-addons.litematica.info.block": "Block light: expected %s, found %s",
+  "cosmos-carpet-addons.litematica.info.sky": "Sky light: expected %s, found %s"
 }

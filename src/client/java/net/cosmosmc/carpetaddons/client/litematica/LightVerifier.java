@@ -17,8 +17,11 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Light level part of a Litematica schematic verifier: compares the light levels stored in the schematic
@@ -30,6 +33,18 @@ public final class LightVerifier {
             String sky = expectedSky >= 0 ? ", sky %d (found %d)".formatted(expectedSky, foundSky) : "";
             return "%d %d %d: block %d (found %d)%s".formatted(pos.getX(), pos.getY(), pos.getZ(), expectedBlock, foundBlock, sky);
         }
+
+        /** @return the categories this mismatch belongs to: one per light layer that differs */
+        public List<Category> categories() {
+            List<Category> list = new ArrayList<>(2);
+            if (expectedBlock != foundBlock) list.add(new Category(LightLayer.BLOCK, expectedBlock, foundBlock));
+            if (expectedSky >= 0 && expectedSky != foundSky) list.add(new Category(LightLayer.SKY, expectedSky, foundSky));
+            return list;
+        }
+    }
+
+    /** A kind of light mismatch, e.g. "block light: expected 1, found 15". */
+    public record Category(LightLayer layer, int expected, int found) {
     }
 
     /** How often known mismatches are re-checked, in real time (Litematica runs the verifier only every few ticks). */
@@ -38,6 +53,10 @@ public final class LightVerifier {
     private static final double RESORT_DISTANCE_SQ = 4 * 4;
 
     private final Long2ObjectMap<LightMismatch> mismatches = new Long2ObjectOpenHashMap<>();
+    /** Ignored categories, kept when re-verifying (like Litematica's ignored block mismatches). */
+    private final Set<Category> ignored = new HashSet<>();
+    /** Categories selected for highlighting; empty highlights all (non-ignored) mismatches. */
+    private final Set<Category> selected = new HashSet<>();
     private List<BlockPos> closest = List.of();
     private boolean closestDirty = false;
     private @Nullable BlockPos closestCenter = null;
@@ -47,6 +66,7 @@ public final class LightVerifier {
 
     public void clear() {
         mismatches.clear();
+        selected.clear();
         closest = List.of();
         closestDirty = false;
         checkedPositions = 0;
@@ -57,23 +77,89 @@ public final class LightVerifier {
         return schematicHasLight;
     }
 
-    public int mismatchCount() {
-        return mismatches.size();
-    }
-
     public int checkedPositions() {
         return checkedPositions;
     }
 
+    private boolean isActive(LightMismatch mismatch) {
+        for (Category category : mismatch.categories()) {
+            if (!ignored.contains(category)) return true;
+        }
+        return false;
+    }
+
+    private boolean isHighlighted(LightMismatch mismatch) {
+        for (Category category : mismatch.categories()) {
+            if (!ignored.contains(category) && (selected.isEmpty() || selected.contains(category))) return true;
+        }
+        return false;
+    }
+
+    /** @return the number of mismatches that are not (fully) ignored */
+    public int mismatchCount() {
+        int count = 0;
+        for (LightMismatch mismatch : mismatches.values()) {
+            if (isActive(mismatch)) count++;
+        }
+        return count;
+    }
+
+    /** @return the mismatch at {@code pos} if it is not ignored, or null */
+    public @Nullable LightMismatch getMismatch(BlockPos pos) {
+        LightMismatch mismatch = mismatches.get(pos.asLong());
+        return mismatch != null && isActive(mismatch) ? mismatch : null;
+    }
+
+    /** @return the non-ignored categories with their number of positions, most frequent first */
+    public List<Map.Entry<Category, Integer>> categoryCounts() {
+        Map<Category, Integer> counts = new HashMap<>();
+        for (LightMismatch mismatch : mismatches.values()) {
+            for (Category category : mismatch.categories()) {
+                if (!ignored.contains(category)) counts.merge(category, 1, Integer::sum);
+            }
+        }
+        List<Map.Entry<Category, Integer>> list = new ArrayList<>(counts.entrySet());
+        list.sort(Map.Entry.<Category, Integer>comparingByValue().reversed()
+                .thenComparing(e -> e.getKey().layer())
+                .thenComparingInt(e -> e.getKey().expected())
+                .thenComparingInt(e -> e.getKey().found()));
+        return list;
+    }
+
+    public boolean isSelected(Category category) {
+        return selected.contains(category);
+    }
+
+    public void toggleSelected(Category category) {
+        if (!selected.remove(category)) selected.add(category);
+        closestDirty = true;
+    }
+
+    public void ignore(Category category) {
+        ignored.add(category);
+        selected.remove(category);
+        closestDirty = true;
+    }
+
+    public int ignoredCount() {
+        return ignored.size();
+    }
+
+    public void resetIgnored() {
+        ignored.clear();
+        closestDirty = true;
+    }
+
     /**
-     * @return the mismatches to highlight, closest to the player first. Updated right away when mismatches are found or
-     * fixed (and when the player moved a bit), so markers show up as soon as the verifier found them.
+     * @return the mismatches to highlight (not ignored, and in a selected category if any are selected), closest to the
+     * player first. Updated right away when mismatches change (and when the player moved a bit).
      */
     public List<BlockPos> closestMismatches() {
         var player = net.minecraft.client.Minecraft.getInstance().player;
         BlockPos center = player == null ? BlockPos.ZERO : player.blockPosition();
         if (closestDirty || closestCenter == null || closestCenter.distSqr(center) > RESORT_DISTANCE_SQ) {
             closest = mismatches.values().stream()
+                    .filter(this::isHighlighted)
                     .map(LightMismatch::pos)
                     .sorted(Comparator.comparingDouble(pos -> pos.distSqr(center)))
                     .limit(LitematicaLightConfigs.LIGHT_OVERLAY_MAX_POSITIONS.getIntegerValue())
@@ -84,9 +170,10 @@ public final class LightVerifier {
         return closest;
     }
 
-    /** @return up to {@code max} mismatches, closest to {@code center} first (independent of the periodic recheck) */
+    /** @return up to {@code max} non-ignored mismatches, closest to {@code center} first */
     public List<LightMismatch> closestMismatchDetails(@Nullable BlockPos center, int max) {
         return mismatches.values().stream()
+                .filter(this::isActive)
                 .sorted(Comparator.comparingDouble(m -> center == null ? 0 : m.pos().distSqr(center)))
                 .limit(max)
                 .toList();

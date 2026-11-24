@@ -139,10 +139,13 @@ an "Include light levels" option. It stores the block and sky light level of eve
 (a `cca:Light` entry in each sub-region). Unmodified Litematica clients load these schematics normally and
 just ignore the light data (it is dropped if they save the schematic again).
 
-The schematic verifier then also verifies light levels: the "Light: N mismatches" button shows the count,
-lists the closest mismatches when hovered, and toggles highlighting them in the world. Fixed mismatches and
-mismatches the placement no longer covers (e.g. after moving it) disappear within a second; new ones are found by
-running the verifier again.
+The schematic verifier then also verifies light levels. The "Wrong Light: N" button (next to the Litematica
+menu button) lists the closest mismatches when hovered and opens the "Wrong Light Levels" tab: it groups the
+mismatches into categories like "block light: expected 1, found 15" with their counts. Categories can be
+highlighted (only the selected ones are highlighted; none selected highlights all) and ignored, like
+Litematica's own mismatch categories. Looking at a highlighted position shows its expected and found light
+levels. Fixed mismatches and mismatches the placement no longer covers (e.g. after moving it) disappear within
+a second; new ones are found by running the verifier again.
 
 Pasting schematics also pastes their light levels while the `lightLevelManipulator` rule is enabled (otherwise
 the pasted blocks would be relit right away). Light is only written where the schematic's block was actually pasted
