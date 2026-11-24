@@ -33,13 +33,14 @@ public final class LitematicaLightConfigs {
     // Info Overlays
     public static final ConfigBoolean LIGHT_OVERLAY_ENABLED = (ConfigBoolean) new ConfigBoolean("verifierLightOverlayEnabled", false).apply(PREFIX);
     public static final ConfigBoolean LIGHT_OVERLAY_OVER_OTHER_MARKERS = (ConfigBoolean) new ConfigBoolean("verifierLightOverlayOverOtherMarkers", false).apply(PREFIX);
+    public static final ConfigBoolean LIGHT_INFO_THROUGH_BLOCKS = (ConfigBoolean) new ConfigBoolean("verifierLightInfoThroughBlocks", false).apply(PREFIX);
     public static final ConfigInteger LIGHT_OVERLAY_MAX_POSITIONS = (ConfigInteger) new ConfigInteger("verifierLightOverlayMaxPositions", 1000, 1, 1000000).apply(PREFIX);
 
     // Colors
     public static final ConfigColor LIGHT_OVERLAY_COLOR = new ConfigColor("schematicOverlayColorWrongLight", "#FF9966FF").apply(PREFIX);
 
     public static final List<IConfigBase> GENERIC = ImmutableList.of(SAVE_INCLUDE_LIGHT, PASTE_INCLUDE_LIGHT, VERIFY_LIGHT, VERIFY_SKY_LIGHT);
-    public static final List<IConfigBase> INFO_OVERLAYS = ImmutableList.of(LIGHT_OVERLAY_ENABLED, LIGHT_OVERLAY_OVER_OTHER_MARKERS, LIGHT_OVERLAY_MAX_POSITIONS);
+    public static final List<IConfigBase> INFO_OVERLAYS = ImmutableList.of(LIGHT_OVERLAY_ENABLED, LIGHT_OVERLAY_OVER_OTHER_MARKERS, LIGHT_INFO_THROUGH_BLOCKS, LIGHT_OVERLAY_MAX_POSITIONS);
     public static final List<IConfigBase> COLORS = ImmutableList.of(LIGHT_OVERLAY_COLOR);
 
     private LitematicaLightConfigs() {

@@ -143,8 +143,9 @@ The schematic verifier then also verifies light levels. The "Wrong Light: N" but
 menu button) lists the closest mismatches when hovered and opens the "Wrong Light Levels" tab: it groups the
 mismatches into categories like "block light: expected 1, found 15" with their counts. Categories can be
 highlighted (only the selected ones are highlighted; none selected highlights all) and ignored, like
-Litematica's own mismatch categories. Looking at a highlighted position shows its expected and found light
-levels. Fixed mismatches and mismatches the placement no longer covers (e.g. after moving it) disappear within
+Litematica's own mismatch categories. Looking at a highlighted position within Litematica's easy place reach shows its expected and
+found light levels (not through other blocks, unless enabled; the highlights themselves always render through
+blocks). Fixed mismatches and mismatches the placement no longer covers (e.g. after moving it) disappear within
 a second; new ones are found by running the verifier again.
 
 Pasting schematics also pastes their light levels while the `lightLevelManipulator` rule is enabled (otherwise
@@ -167,6 +168,7 @@ Options are added to Litematica's config screen (stored in `config/cosmos-carpet
 | Generic | Verifier: Check Sky Light | on |
 | Info Overlays | Verifier Light Overlay | off |
 | Info Overlays | Verifier Light Overlay Over Other Markers | off |
+| Info Overlays | Verifier Light Info Through Blocks | off |
 | Info Overlays | Verifier Light Overlay Max Positions | 1000 |
 | Colors | Schematic Overlay Color Wrong Light | `#FF9966FF` |
 

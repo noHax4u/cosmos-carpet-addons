@@ -68,5 +68,8 @@
   "cosmos-carpet-addons.litematica.light_tab.page": "Page %s / %s",
   "cosmos-carpet-addons.litematica.info.title": "Wrong light level",
   "cosmos-carpet-addons.litematica.info.block": "Block light: expected %s, found %s",
-  "cosmos-carpet-addons.litematica.info.sky": "Sky light: expected %s, found %s"
+  "cosmos-carpet-addons.litematica.info.sky": "Sky light: expected %s, found %s",
+  "cosmos-carpet-addons.litematica.config.name.verifierLightInfoThroughBlocks": "verifierLightInfoThroughBlocks",
+  "cosmos-carpet-addons.litematica.config.prettyName.verifierLightInfoThroughBlocks": "Verifier Light Info Through Blocks",
+  "cosmos-carpet-addons.litematica.config.comment.verifierLightInfoThroughBlocks": "Also show the expected and found light levels when the highlighted position\nyou are looking at is behind another block (Cosmos Carpet Addons)"
 }

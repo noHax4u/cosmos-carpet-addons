@@ -2,6 +2,7 @@ package net.cosmosmc.carpetaddons.client.litematica;
 
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.util.EasyPlaceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import net.cosmosmc.carpetaddons.CosmosCarpetAddons;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
@@ -11,14 +12,18 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.HitResult;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Shows the expected and found light levels while looking at a light mismatch marker of the schematic verifier.
+ * Shows the expected and found light levels while looking at a light mismatch marker of the schematic verifier
+ * that is within Litematica's easy place reach (and not hidden behind another block, unless configured otherwise).
  */
 public final class LightMismatchInfoHud {
     private LightMismatchInfoHud() {
@@ -48,9 +53,19 @@ public final class LightMismatchInfoHud {
         }
     }
 
+    /** Whether a different block is in the way between the camera and the targeted marker (the markers render through blocks). */
+    private static boolean isBehindBlock(Minecraft mc, BlockHitResult markerHit) {
+        Entity camera = mc.getCameraEntity();
+        Vec3 eye = camera.getEyePosition();
+        BlockHitResult blocking = mc.level.clip(new ClipContext(eye, markerHit.getLocation(), ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, camera));
+        return blocking.getType() == HitResult.Type.BLOCK
+                && !blocking.getBlockPos().equals(markerHit.getBlockPos())
+                && blocking.getLocation().distanceToSqr(eye) < markerHit.getLocation().distanceToSqr(eye) - 1.0E-6;
+    }
+
     private static List<Component> lines() {
         Minecraft mc = Minecraft.getInstance();
-        if (!LitematicaLightConfigs.LIGHT_OVERLAY_ENABLED.getBooleanValue() || mc.getCameraEntity() == null) {
+        if (!LitematicaLightConfigs.LIGHT_OVERLAY_ENABLED.getBooleanValue() || mc.getCameraEntity() == null || mc.level == null) {
             return List.of();
         }
         SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
@@ -58,8 +73,10 @@ public final class LightMismatchInfoHud {
             return List.of();
         }
         LightVerifier verifier = ((LightVerifierHolder) placement.getSchematicVerifier()).cca$getLightVerifier();
-        BlockHitResult hit = RayTraceUtils.traceToPositions(verifier.closestMismatches(), mc.getCameraEntity(), 128.0);
-        if (hit == null || hit.getType() != HitResult.Type.BLOCK) {
+        // only within Litematica's easy place reach, like targeting a block
+        double range = EasyPlaceUtils.getValidBlockRange(mc);
+        BlockHitResult hit = RayTraceUtils.traceToPositions(verifier.closestMismatches(), mc.getCameraEntity(), range);
+        if (hit == null || hit.getType() != HitResult.Type.BLOCK || (!LitematicaLightConfigs.LIGHT_INFO_THROUGH_BLOCKS.getBooleanValue() && isBehindBlock(mc, hit))) {
             return List.of();
         }
         LightVerifier.LightMismatch mismatch = verifier.getMismatch(hit.getBlockPos());
