@@ -21,7 +21,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Verifies light levels alongside the blocks, for schematics that contain light data.
@@ -65,7 +67,8 @@ public abstract class SchematicVerifierMixin implements LightVerifierHolder {
 
     /**
      * Highlights light mismatches with Litematica's own mismatch overlay. There is no light mismatch type,
-     * so they use the "different block" color.
+     * so they use the "different block" color. Positions that already show a block mismatch marker are skipped,
+     * since overlapping markers render badly.
      */
     @Inject(method = "getSelectedMismatchPositionsForRender", at = @At("RETURN"), cancellable = true)
     private void cca$renderLightMismatches(CallbackInfoReturnable<List<SchematicVerifier.MismatchRenderPos>> cir) {
@@ -74,8 +77,14 @@ public abstract class SchematicVerifierMixin implements LightVerifierHolder {
             return;
         }
         List<SchematicVerifier.MismatchRenderPos> list = new ArrayList<>(cir.getReturnValue());
+        Set<BlockPos> marked = new HashSet<>();
+        for (SchematicVerifier.MismatchRenderPos entry : list) {
+            marked.add(entry.pos());
+        }
         for (BlockPos pos : lightMismatches) {
-            list.add(new SchematicVerifier.MismatchRenderPos(SchematicVerifier.MismatchType.DIFF_BLOCK, pos));
+            if (!marked.contains(pos)) {
+                list.add(new SchematicVerifier.MismatchRenderPos(SchematicVerifier.MismatchType.DIFF_BLOCK, pos));
+            }
         }
         cir.setReturnValue(list);
     }
