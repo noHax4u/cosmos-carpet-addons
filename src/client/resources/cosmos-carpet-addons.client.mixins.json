@@ -3,6 +3,7 @@
 	"package": "net.cosmosmc.carpetaddons.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
+		"ItemModelResolverMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

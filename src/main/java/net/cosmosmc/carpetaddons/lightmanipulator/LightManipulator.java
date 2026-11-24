@@ -5,11 +5,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundLightUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.BlockItemStateProperties;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.LightBlock;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -18,6 +21,7 @@ import net.minecraft.world.level.lighting.LightEngine;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -74,13 +78,24 @@ public final class LightManipulator {
                 CompletableFuture<Result> future = new CompletableFuture<>();
                 futures.add(future);
                 int cx = chunkX, cz = chunkZ;
+                BitSet changedSections = new BitSet();
+                Result[] result = new Result[1];
                 scheduler.cca$submitLightTask(cx, cz, () -> {
                     try {
-                        future.complete(applyToChunk(storage, box, cx, cz, function));
+                        result[0] = applyToChunk(storage, box, cx, cz, function, lightEngine.getMinLightSection(), changedSections);
                     } catch (Throwable t) {
                         CosmosCarpetAddons.LOGGER.error("Failed to manipulate light in chunk [{}, {}]", cx, cz, t);
                         future.completeExceptionally(t);
                     }
+                }, () -> {
+                    // runs after the light engine published the changes
+                    if (result[0] == null) {
+                        return;
+                    }
+                    if (!changedSections.isEmpty()) {
+                        level.getServer().execute(() -> sendLightUpdate(level, new ChunkPos(cx, cz), layer, changedSections));
+                    }
+                    future.complete(result[0]);
                 });
             }
         }
@@ -94,7 +109,26 @@ public final class LightManipulator {
         });
     }
 
-    private static Result applyToChunk(LayerLightSectionStorage<?> storage, BoundingBox box, int chunkX, int chunkZ, LightFunction function) {
+    /**
+     * Vanilla only sends light updates to players on the edge of their view distance, since clients light
+     * block changes themselves. Manipulated light has to be sent to everyone tracking the chunk.
+     */
+    private static void sendLightUpdate(ServerLevel level, ChunkPos pos, LightLayer layer, BitSet changedSections) {
+        List<ServerPlayer> players = level.getChunkSource().chunkMap.getPlayers(pos, false);
+        if (players.isEmpty()) {
+            return;
+        }
+        BitSet empty = new BitSet();
+        var packet = new ClientboundLightUpdatePacket(pos, level.getChunkSource().getLightEngine(),
+                layer == LightLayer.SKY ? changedSections : empty,
+                layer == LightLayer.BLOCK ? changedSections : empty);
+        for (ServerPlayer player : players) {
+            player.connection.send(packet);
+        }
+    }
+
+    private static Result applyToChunk(LayerLightSectionStorage<?> storage, BoundingBox box, int chunkX, int chunkZ, LightFunction function,
+                                       int minLightSection, BitSet changedSections) {
         int minX = Math.max(box.minX(), SectionPos.sectionToBlockCoord(chunkX));
         int maxX = Math.min(box.maxX(), SectionPos.sectionToBlockCoord(chunkX, 15));
         int minZ = Math.max(box.minZ(), SectionPos.sectionToBlockCoord(chunkZ));
@@ -125,6 +159,7 @@ public final class LightManipulator {
                         target = Math.min(target, LightEngine.MAX_LEVEL);
                         if (target != current) {
                             storage.setStoredLevel(node, target);
+                            changedSections.set(sectionY - minLightSection);
                             changed++;
                         }
                     }

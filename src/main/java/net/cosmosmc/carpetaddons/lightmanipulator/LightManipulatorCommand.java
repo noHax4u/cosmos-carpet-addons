@@ -15,6 +15,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -28,6 +29,7 @@ import net.minecraft.world.level.lighting.LightEngine;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Supplier;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
@@ -36,6 +38,7 @@ import static net.minecraft.commands.Commands.literal;
  * {@code /lightmanipulator}, available while the {@code lightLevelManipulator} rule is enabled.
  * <pre>
  * /lightmanipulator give (block|sky) [level] [targets]
+ * /lightmanipulator give portal (x|z) [blockLight] [skyLight] [targets]     (-1 = keep the current level)
  * /lightmanipulator fill &lt;from&gt; &lt;to&gt; (block|sky) &lt;level&gt;
  * /lightmanipulator generate &lt;from&gt; &lt;to&gt; (block|sky) [normalized|raw|offset|center] &lt;expression&gt;
  * </pre>
@@ -109,6 +112,21 @@ public final class LightManipulatorCommand {
             generateTo.then(generateLayer);
         }
 
+        var portal = literal("portal");
+        for (Direction.Axis axis : List.of(Direction.Axis.X, Direction.Axis.Z)) {
+            portal.then(literal(axis.getSerializedName())
+                    .executes(c -> givePortal(c, axis, 0, PortalItems.KEEP, false))
+                    .then(argument("blockLight", IntegerArgumentType.integer(PortalItems.KEEP, LightEngine.MAX_LEVEL))
+                            .executes(c -> givePortal(c, axis, IntegerArgumentType.getInteger(c, "blockLight"), PortalItems.KEEP, false))
+                            .then(argument("skyLight", IntegerArgumentType.integer(PortalItems.KEEP, LightEngine.MAX_LEVEL))
+                                    .executes(c -> givePortal(c, axis, IntegerArgumentType.getInteger(c, "blockLight"),
+                                            IntegerArgumentType.getInteger(c, "skyLight"), false))
+                                    .then(argument("targets", EntityArgument.players())
+                                            .executes(c -> givePortal(c, axis, IntegerArgumentType.getInteger(c, "blockLight"),
+                                                    IntegerArgumentType.getInteger(c, "skyLight"), true))))));
+        }
+        give.then(portal);
+
         command.then(give);
         command.then(literal("fill").then(argument("from", BlockPosArgument.blockPos()).then(fillTo)));
         command.then(literal("generate").then(argument("from", BlockPosArgument.blockPos()).then(generateTo)));
@@ -126,15 +144,24 @@ public final class LightManipulatorCommand {
     }
 
     private static int give(CommandSourceStack source, LightLayer layer, int level, Collection<ServerPlayer> targets) {
+        return giveItems(source, () -> LightManipulator.createLightItem(layer, level), layerName(layer) + " light " + level + " item", targets);
+    }
+
+    private static int givePortal(CommandContext<CommandSourceStack> c, Direction.Axis axis, int blockLight, int skyLight, boolean hasTargets) throws CommandSyntaxException {
+        Collection<ServerPlayer> targets = hasTargets ? EntityArgument.getPlayers(c, "targets") : List.of(c.getSource().getPlayerOrException());
+        return giveItems(c.getSource(), () -> PortalItems.create(axis, blockLight, skyLight),
+                "nether portal item (" + axis.getSerializedName() + ")", targets);
+    }
+
+    private static int giveItems(CommandSourceStack source, Supplier<ItemStack> factory, String what, Collection<ServerPlayer> targets) {
         for (ServerPlayer player : targets) {
-            ItemStack stack = LightManipulator.createLightItem(layer, level);
+            ItemStack stack = factory.get();
             if (!player.getInventory().add(stack)) {
                 player.drop(stack, false);
             }
             player.containerMenu.broadcastChanges();
         }
 
-        String what = layerName(layer) + " light " + level + " item";
         if (targets.size() == 1) {
             String name = targets.iterator().next().getName().getString();
             source.sendSuccess(() -> Component.literal("Gave a " + what + " to " + name), true);

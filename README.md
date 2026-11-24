@@ -65,11 +65,18 @@ While enabled:
 
 ```
 /lightmanipulator give (block|sky) [<level>] [<targets>]
+/lightmanipulator give portal (x|z) [<blockLight>] [<skyLight>] [<targets>]
 /lightmanipulator fill <from> <to> (block|sky) <level>
 /lightmanipulator generate <from> <to> (block|sky) [normalized|raw|offset|center] <expression>
 ```
 
 `give` hands out a light item for the given level (default 0); the `sky` variant has the glint override set.
+
+`give portal` hands out a nether portal item with the given axis. Placing it places a nether portal block
+without a frame (neighbours are not updated, so it doesn't break right away) and, while the rule is enabled,
+sets the block light (default 0) and sky light of that position. A level of `-1` keeps the current level
+(default for sky light). Portal items are purple stained glass panes with custom data: clients with this
+mod installed render them as actual nether portals, vanilla clients see a purple stained glass pane.
 
 `generate` works like WorldEdit's `//generate`: the expression is evaluated for every position
 and its result is used as the light level (rounded and clamped to 0 - 15). A negative result
@@ -96,8 +103,9 @@ Notes:
 - Areas are limited to 16,777,216 positions and must be loaded.
 - Positions in sections that store no light data (e.g. high above the terrain) are skipped.
 - Edited light stays until something triggers a light update there after the rule is disabled.
-- Clients still compute light locally for blocks they change, so they may briefly show vanilla
-  lighting around changed blocks until the server resends the chunk's light.
+- Changed light is sent to all players tracking the chunk. Clients still compute light locally for
+  blocks they change themselves, so they may show vanilla lighting around those blocks until the
+  chunk is reloaded.
 
 - Type: `boolean`
 - Default value: `false`

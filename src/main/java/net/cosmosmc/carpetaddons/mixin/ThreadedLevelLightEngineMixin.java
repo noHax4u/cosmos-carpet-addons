@@ -28,7 +28,8 @@ public abstract class ThreadedLevelLightEngineMixin implements LightTaskSchedule
     }
 
     @Override
-    public void cca$submitLightTask(int chunkX, int chunkZ, Runnable task) {
+    public void cca$submitLightTask(int chunkX, int chunkZ, Runnable task, Runnable afterUpdate) {
         addTask(chunkX, chunkZ, ThreadedLevelLightEngine.TaskType.PRE_UPDATE, task);
+        addTask(chunkX, chunkZ, ThreadedLevelLightEngine.TaskType.POST_UPDATE, afterUpdate);
     }
 }
