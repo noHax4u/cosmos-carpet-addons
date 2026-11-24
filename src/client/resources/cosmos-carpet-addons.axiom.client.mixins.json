@@ -1,0 +1,15 @@
+{
+	"required": false,
+	"package": "net.cosmosmc.carpetaddons.client.mixin.axiom",
+	"plugin": "net.cosmosmc.carpetaddons.mixin.axiom.AxiomMixinPlugin",
+	"compatibilityLevel": "JAVA_25",
+	"priority": 1100,
+	"client": [
+		"CloneBuilderToolMixin",
+		"MoveBuilderToolMixin",
+		"RegionHelperMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

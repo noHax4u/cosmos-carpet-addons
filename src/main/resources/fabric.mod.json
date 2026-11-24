@@ -24,8 +24,13 @@
 	},
 	"mixins": [
 		"cosmos-carpet-addons.mixins.json",
+		"cosmos-carpet-addons.axiom.mixins.json",
 		{
 			"config": "cosmos-carpet-addons.client.mixins.json",
+			"environment": "client"
+		},
+		{
+			"config": "cosmos-carpet-addons.axiom.client.mixins.json",
 			"environment": "client"
 		}
 	],
@@ -35,6 +40,9 @@
 		"java": ">=25",
 		"fabric-api": "*",
 		"carpet": "*"
+	},
+	"suggests": {
+		"axiom": "*"
 	},
 	"custom": {
 		"modmenu": {

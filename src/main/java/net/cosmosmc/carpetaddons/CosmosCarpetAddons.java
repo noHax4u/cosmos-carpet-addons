@@ -1,6 +1,7 @@
 package net.cosmosmc.carpetaddons;
 
 import carpet.CarpetExtension;
+import net.cosmosmc.carpetaddons.lightmanipulator.network.LightNetworking;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.resources.Identifier;
@@ -17,6 +18,7 @@ public class CosmosCarpetAddons implements ModInitializer {
 	public void onInitialize() {
 		LOGGER.info("Hello Fabric world!");
 		CosmosCarpetAddonsServer.init();
+		LightNetworking.init();
 	}
 
 	public static Identifier id(String path) {

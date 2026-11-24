@@ -107,6 +107,21 @@ Notes:
   blocks they change themselves, so they may show vanilla lighting around those blocks until the
   chunk is reloaded.
 
+#### Axiom integration (optional)
+
+If [Axiom](https://modrinth.com/mod/axiom) is installed on the server and on the builder's client
+(together with this mod), its builder tools copy the light levels of their source blocks while the rule is
+enabled, instead of recalculating light. For example, stacking a nether portal with block light 3 and sky
+light 0 produces more portals with block light 3 and sky light 0. Supported tools: stack, extrude, clone
+and move (including rotation and flipping). Other Axiom edits leave the existing light untouched.
+
+Axiom is not required: without it, the integration is simply not loaded. Fabric has no way to make sure
+Axiom loads before this mod, so the integration doesn't depend on load order: its mixins only target Axiom
+and are only applied when Axiom is installed.
+
+Clients with this mod also stop relighting their own block changes while the rule is enabled, so what
+they see matches the server.
+
 - Type: `boolean`
 - Default value: `false`
 - Accepted values: `true`, `false`
@@ -121,6 +136,23 @@ logs TNT minecart info useful for designing TNT minecart duping looters
 - chat (default): only prints info to chat
 - sound: only plays sounds when a tnt minecart gets destroyed (bell on success, fart on failure)
 - full: prints to chat and plays sounds
+
+## Building
+
+```
+./gradlew build
+```
+
+The jar ends up in `build/libs`. Axiom is only needed at compile time (it is downloaded from Modrinth's
+Maven automatically) and is not bundled.
+
+To test with Axiom in the dev environment, install it into `run/mods`, then run the client or server as usual:
+
+```
+./gradlew installAxiomDev
+./gradlew runClient
+./gradlew removeAxiomDev
+```
 
 ## License
 

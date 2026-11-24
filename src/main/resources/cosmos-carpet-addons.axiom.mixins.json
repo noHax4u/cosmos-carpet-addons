@@ -1,0 +1,13 @@
+{
+	"required": false,
+	"package": "net.cosmosmc.carpetaddons.mixin.axiom",
+	"plugin": "net.cosmosmc.carpetaddons.mixin.axiom.AxiomMixinPlugin",
+	"compatibilityLevel": "JAVA_25",
+	"priority": 1100,
+	"mixins": [
+		"AxiomServerboundSetBufferMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

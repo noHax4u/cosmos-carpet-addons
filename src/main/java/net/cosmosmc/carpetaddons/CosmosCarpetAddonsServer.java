@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.Strictness;
 import com.google.gson.reflect.TypeToken;
 import net.cosmosmc.carpetaddons.lightmanipulator.LightManipulatorCommand;
+import net.cosmosmc.carpetaddons.lightmanipulator.network.LightNetworking;
 import net.cosmosmc.carpetaddons.logging.Loggers;
 import net.cosmosmc.carpetaddons.settings.CosmosCarpetAddonsSettings;
 import net.minecraft.commands.CommandBuildContext;
@@ -51,6 +52,7 @@ public class CosmosCarpetAddonsServer implements CarpetExtension {
             }
             if (source != null && rule.name().equals("lightLevelManipulator")) {
                 CommandHelper.notifyPlayersCommandsChanged(source.getServer());
+                LightNetworking.broadcastState(source.getServer());
             }
         });
     }

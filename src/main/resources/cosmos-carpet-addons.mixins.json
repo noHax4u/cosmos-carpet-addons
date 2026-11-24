@@ -5,6 +5,7 @@
 	"mixins": [
 		"BlockItemMixin",
 		"EntityMixin",
+		"LevelLightEngineMixin",
 		"MinecartTNTDebugger",
 		"PlayerListMixin",
 		"ServerGamePacketListenerImplMixin",

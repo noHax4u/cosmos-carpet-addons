@@ -9,6 +9,16 @@ repositories {
 		url = 'https://masa.dy.fi/maven'
 		content { includeModule('carpet', 'fabric-carpet') }
 	}
+	// Axiom (optional integration, compile only)
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = 'Modrinth'
+				url = 'https://api.modrinth.com/maven'
+			}
+		}
+		filter { includeGroup('maven.modrinth') }
+	}
 }
 
 loom {
@@ -22,6 +32,29 @@ loom {
 	}
 
 	accessWidenerPath = file("src/main/resources/cosmos-carpet-addons.classtweaker")
+
+	runs {
+		configureEach {
+			// Fabric has no load order setting and shuffles mods in dev; load this mod last in dev runs
+			vmArg "-Dfabric.debug.loadLate=cosmos-carpet-addons"
+		}
+	}
+}
+
+configurations {
+	// only used to extract Axiom's nested API jar for compilation
+	axiom { transitive = false }
+}
+
+// Axiom's classes reference its client API, which is bundled inside the Axiom jar (jar-in-jar)
+def extractAxiomApi = tasks.register("extractAxiomApi", Sync) {
+	def axiomJar = configurations.axiom
+	from({ axiomJar.collect { zipTree(it) } }) {
+		include "META-INF/jars/axiomclientapi*.jar"
+		eachFile { it.path = it.name }
+	}
+	includeEmptyDirs = false
+	into layout.buildDirectory.dir("axiom-api")
 }
 
 dependencies {
@@ -34,6 +67,21 @@ dependencies {
 
 	// carpet
 	implementation "carpet:fabric-carpet:${project.fabric_carpet_version}"
+
+	// Axiom: optional, never bundled. Its mixins are only applied when Axiom is installed.
+	compileOnly "maven.modrinth:axiom:${project.axiom_version}"
+	axiom "maven.modrinth:axiom:${project.axiom_version}"
+	compileOnly files(layout.buildDirectory.file("axiom-api/axiomclientapi-unobf.jar")).builtBy(extractAxiomApi)
+}
+
+// Dev runs with Axiom: ./gradlew installAxiomDev, then runClient / runServer as usual; ./gradlew removeAxiomDev undoes it.
+// (Fabric Loader rejects Axiom on the dev classpath, so it goes into run/mods like a normal install.)
+tasks.register("installAxiomDev", Copy) {
+	from configurations.axiom
+	into file("run/mods")
+}
+tasks.register("removeAxiomDev", Delete) {
+	delete fileTree("run/mods") { include "axiom-*.jar", "Axiom-*.jar" }
 }
 
 processResources {

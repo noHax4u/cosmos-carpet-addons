@@ -1,6 +1,7 @@
 package net.cosmosmc.carpetaddons.lightmanipulator;
 
 import net.cosmosmc.carpetaddons.CosmosCarpetAddons;
+import net.cosmosmc.carpetaddons.lightmanipulator.network.SectionLight;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.component.DataComponents;
@@ -168,6 +169,22 @@ public final class LightManipulator {
         }
 
         return new Result(changed, skipped);
+    }
+
+    /**
+     * Writes the masked block and sky light levels of {@code section}.
+     */
+    public static void applySectionLight(ServerLevel level, SectionLight section) {
+        SectionPos pos = SectionPos.of(section.sectionPos());
+        BoundingBox box = new BoundingBox(pos.minBlockX(), pos.minBlockY(), pos.minBlockZ(), pos.maxBlockX(), pos.maxBlockY(), pos.maxBlockZ());
+        BitSet mask = section.mask();
+
+        apply(level, LightLayer.BLOCK, box, (x, y, z, current) ->
+                mask.get(SectionLight.index(x, y, z)) ? section.block().get(x & 15, y & 15, z & 15) : -1);
+        if (section.sky() != null && hasLayer(level, LightLayer.SKY)) {
+            apply(level, LightLayer.SKY, box, (x, y, z, current) ->
+                    mask.get(SectionLight.index(x, y, z)) ? section.sky().get(x & 15, y & 15, z & 15) : -1);
+        }
     }
 
     // ---------------------------------------------------------------------------------------------
